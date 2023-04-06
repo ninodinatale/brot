@@ -1,0 +1,91 @@
+{
+  "project_info": {
+    "project_number": "157424518991",
+    "firebase_url": "https://who-is-the-bread-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "who-is-the-bread",
+    "storage_bucket": "who-is-the-bread.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:157424518991:android:7ae0c70d48cadace93273a",
+        "android_client_info": {
+          "package_name": "com.example.brot"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "157424518991-vqkl6uaep34lhvqfq424c2fpp28nq1iq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCunwiFI9qVJyhvhyyyx0YTr1JRlzVdqdI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "157424518991-vqkl6uaep34lhvqfq424c2fpp28nq1iq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "157424518991-7j4fjm20es1p02getuu837e7koivmtqs.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.flutterflow.whoisthebread"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:157424518991:android:dd57d390a04bfb0493273a",
+        "android_client_info": {
+          "package_name": "com.flutterflow.whoisthebread"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "157424518991-2ie1h3d15o9rjhcrmaqj913a8hptolvk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.flutterflow.whoisthebread",
+            "certificate_hash": "9bbb3186b2189ef16d8f272bdab59362c395cbb4"
+          }
+        },
+        {
+          "client_id": "157424518991-vqkl6uaep34lhvqfq424c2fpp28nq1iq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCunwiFI9qVJyhvhyyyx0YTr1JRlzVdqdI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "157424518991-vqkl6uaep34lhvqfq424c2fpp28nq1iq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "157424518991-7j4fjm20es1p02getuu837e7koivmtqs.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.flutterflow.whoisthebread"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

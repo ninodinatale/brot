@@ -1,0 +1,43 @@
+{
+  "games": {
+    "111111": {
+      "adminUserId": "5a3bb090-975e-4d95-ad63-1c0035f14ba3",
+      "gameId": 111111,
+      "members": {
+        "3116330f-4c0e-4a88-b668-f080a5195ca7": {
+          "isAdmin": false,
+          "name": "_UNSET_"
+        },
+        "4e6ffb67-4178-46df-94c0-cdda32d2fa29": {
+          "isAdmin": false,
+          "name": "Fuchsi"
+        },
+        "c6feb4f3-38fe-452a-9511-acc1537a5f010": {
+          "isAdmin": false,
+          "name": "Chabi"
+        },
+        "c6feb4f3-38fe-452a-9511-acc1537a5f08": {
+          "isAdmin": true,
+          "name": "Admin"
+        },
+        "5a3bb090-975e-4d95-ad63-1c0035f14ba3": {
+          "isAdmin": false,
+          "name": "Nino"
+        },
+        "c6feb4f3-38fe-452a-9511-acc1537a5f11": {
+          "isAdmin": false,
+          "name": "Jönu"
+        },
+        "c6feb4f3-38fe-452a-9511-acc1537a5f12": {
+          "isAdmin": false,
+          "name": "Luq"
+        },
+        "d4bc07e6-ab74-4670-823d-970a4fdf7818": {
+          "isAdmin": false,
+          "name": "Huri"
+        }
+      },
+      "status": 0
+    }
+  }
+}
