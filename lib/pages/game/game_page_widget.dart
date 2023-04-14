@@ -6,7 +6,6 @@ import 'package:brot/models/state/member.dart';
 import 'package:brot/models/state/user_member.dart';
 import 'package:brot/models/state/word.dart';
 import 'package:brot/pages/game/header_widget.dart';
-import 'package:brot/widgets/suited_loading_spinner_widget.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -156,7 +155,7 @@ class _GamePageWidgetState extends State<GamePageWidget> {
               ),
             );
           } else {
-            return SuitedLoadingSpinner(color: theme.colorScheme.onPrimary);
+            return CircularProgressIndicator(color: theme.colorScheme.onPrimary);
           }
         });
   }

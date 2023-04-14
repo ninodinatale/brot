@@ -1,7 +1,6 @@
 import 'package:brot/models/state/game.dart';
 import 'package:brot/models/state/user_id.dart';
 import 'package:brot/pages/game/playing/enter_word_widget.dart';
-import 'package:brot/widgets/suited_loading_spinner_widget.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -37,8 +36,12 @@ class PlayingHeaderWidget extends StatelessWidget {
                 return const EnterWordWidget();
               }
             } else {
-              return SuitedLoadingSpinner(
-                  size: 40, color: Theme.of(context).colorScheme.primary);
+              return SizedBox(
+                height: 40,
+                width: 40,
+                child: CircularProgressIndicator(
+                    color: Theme.of(context).colorScheme.primary),
+              );
             }
           }),
     );

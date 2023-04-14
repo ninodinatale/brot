@@ -1,7 +1,6 @@
 import 'package:brot/models/state/game.dart';
 import 'package:brot/models/state/user_id.dart';
 import 'package:brot/models/state/word.dart';
-import 'package:brot/widgets/suited_loading_spinner_widget.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -48,6 +47,7 @@ class _EnterWordWidgetState extends State<EnterWordWidget> {
     final userId = Provider.of<UserId>(context);
 
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Expanded(
           child: TextField(
@@ -71,15 +71,17 @@ class _EnterWordWidgetState extends State<EnterWordWidget> {
         ),
         Padding(
           padding: const EdgeInsets.only(left: 8.0),
-          child: SizedBox(
-            child: FilledButton(
-                onPressed: _isValid ? () => _setWord(game, userId) : null,
-                child: !_isLoading
-                    ? SuitedLoadingSpinner(
+          child: FilledButton(
+              onPressed: _isValid ? () => _setWord(game, userId) : null,
+              child: !_isLoading
+                  ? SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
                         color: theme.colorScheme.onPrimary,
-                      )
-                    : const Icon(Icons.check)),
-          ),
+                      ),
+                    )
+                  : const Icon(Icons.check)),
         )
       ],
     );

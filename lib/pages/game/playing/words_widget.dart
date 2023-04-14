@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:brot/models/state/word.dart';
 import 'package:brot/widgets/brot_animated_list.dart';
-import 'package:brot/widgets/suited_loading_spinner_widget.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
@@ -67,7 +66,7 @@ class _WordsWidgetState extends State<WordsWidget> {
             itemBuilder: _itemBuilder,
           );
         } else {
-          return SuitedLoadingSpinner(
+          return CircularProgressIndicator(
               color: Theme.of(context).colorScheme.onPrimary);
         }
       },
