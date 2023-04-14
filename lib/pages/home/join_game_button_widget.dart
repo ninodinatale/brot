@@ -1,16 +1,11 @@
-import 'package:brot/firebase_functions.dart';
-import 'package:brot/models/json_serializable/game_model.dart';
-import 'package:brot/models/json_serializable/payload.dart';
-import 'package:brot/models/state/GameState.dart';
-import 'package:brot/models/state/UserIdState.dart';
+import 'package:brot/constants.dart';
+import 'package:brot/database.dart';
+import 'package:brot/models/state/user_id.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 
 import '../../router.dart';
-
-final logger = Logger();
 
 class JoinGameButtonWidget extends StatefulWidget {
   const JoinGameButtonWidget({Key? key}) : super(key: key);
@@ -24,32 +19,41 @@ class JoinGameButtonWidgetState extends State<JoinGameButtonWidget> {
 
   bool _isValid = false;
   var _isGameNotFound = false;
+  var _isGameStarted = false;
   var _isJoinGameLoading = false;
 
-  void _joinGame(void Function(void Function()) setState,
-      DataPayload<JoinGamePayload> payload) {
-    logger.v(
-        'joining game for user ${payload.userId} with gameId ${payload.data.gameId}');
+  String? get _errorText {
+    if (_isGameNotFound) {
+      return 'Spiel mit diesem Code existiert nicht';
+    }
+    if (_isGameStarted) {
+      return 'Spiel bereits gestartet';
+    }
+    return null;
+  }
+
+  void _joinGame(
+      void Function(void Function()) setState, String userId, String gameCode) {
     setState(() {
       _isJoinGameLoading = true;
       _isGameNotFound = false;
     });
 
-    callFbFunction('joinGame', payload).then((result) {
-      logger.v('game created, navigating...');
-      final game = GameModel.fromJson(result.data);
-      GameRoute(
-              gameId: game.gameId.toString(),
-              $extra: GameState.fromGameModel(game))
-          .go(context);
+    joinGame(userId, gameCode).then((data) {
+      final route = GameRoute(data.item1, data.item2);
+      blog.i('navigating to ${route.location}');
+      route.go(context);
     }).catchError((error, stackTrace) {
-      // TODO add user notification
-      if (error.code == 'not-found') {
+      if (error.code == ErrorCodes.gameNotFound) {
         setState(() {
           _isGameNotFound = true;
         });
+      } else if (error.code == ErrorCodes.gameAlreadyStarted) {
+        setState(() {
+          _isGameStarted = true;
+        });
       } else {
-        logger.e('joining game failed', error, stackTrace);
+        blog.e('joining game failed', error, stackTrace);
       }
     }).whenComplete(() => setState(() => _isJoinGameLoading = false));
   }
@@ -65,31 +69,25 @@ class JoinGameButtonWidgetState extends State<JoinGameButtonWidget> {
                       decimal: false, signed: false),
                   onChanged: (value) {
                     _isGameNotFound = false;
+                    _isGameStarted = false;
                     setState(() {
                       _isValid = value.length == 6;
                     });
                   },
                   controller: _controller,
                   decoration: InputDecoration(
-                      label: const Text('Spiel-Code'),
-                      errorText: _isGameNotFound
-                          ? 'Spiel mit diesem Code existiert nicht'
-                          : null),
+                      label: const Text('Spiel-Code'), errorText: _errorText),
                 ),
                 actions: <Widget>[
                   TextButton(
                     onPressed: () => context.pop(),
                     child: const Text('Abbrechen'),
                   ),
-                  Consumer<UserIdState>(
-                    builder: (context, userIdState, child) => ElevatedButton(
+                  Consumer<UserId>(
+                    builder: (context, userId, child) => ElevatedButton(
                       onPressed: _isValid
                           ? () => _joinGame(
-                              setState,
-                              DataPayload<JoinGamePayload>(
-                                  data: JoinGamePayload(
-                                      gameId: _controller.value.text),
-                                  userId: userIdState.userId))
+                              setState, userId, _controller.value.text)
                           : null,
                       child: _isJoinGameLoading
                           ? CircularProgressIndicator(
@@ -111,8 +109,8 @@ class JoinGameButtonWidgetState extends State<JoinGameButtonWidget> {
 
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
+    _controller.dispose();
   }
 
   @override

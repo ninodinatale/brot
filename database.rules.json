@@ -1,6 +1,16 @@
 {
   "rules": {
     ".read": true,
-    ".write": true
+    ".write": true,
+    "members": {
+      "$gameKey": {
+        ".indexOn": "userId"
+      }
+    },
+    "words": {
+      "$gameKey": {
+        ".indexOn": "userId"
+      }
+    }
   }
 }

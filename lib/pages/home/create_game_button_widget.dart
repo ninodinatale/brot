@@ -1,15 +1,10 @@
-import 'package:brot/firebase_functions.dart';
-import 'package:brot/models/json_serializable/game_model.dart';
-import 'package:brot/models/json_serializable/payload.dart';
-import 'package:brot/models/state/GameState.dart';
-import 'package:brot/models/state/UserIdState.dart';
+import 'package:brot/constants.dart';
+import 'package:brot/database.dart';
+import 'package:brot/models/state/user_id.dart';
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 
 import '../../router.dart';
-
-final logger = Logger();
 
 class CreateGameButtonWidget extends StatefulWidget {
   const CreateGameButtonWidget({Key? key}) : super(key: key);
@@ -21,24 +16,17 @@ class CreateGameButtonWidget extends StatefulWidget {
 class CreateGameButtonWidgetState extends State<CreateGameButtonWidget> {
   bool _isCreateGameLoading = false;
 
-  void _createGamePressed(Payload payload) {
+  void _createGamePressed(String userId) {
     assert(!_isCreateGameLoading);
-    logger.v('creating game for user ${payload.userId}');
 
     setState(() {
       _isCreateGameLoading = true;
     });
 
-    callFbFunction('createGame', payload).then((result) {
-      logger.v('game created, navigating to GameRoute');
-      final createGame = GameModel.fromJson(result.data);
-      GameRoute(
-              gameId: createGame.gameId.toString(),
-              $extra: GameState.fromGameModel(createGame))
-          .go(context);
-    }).catchError((error, stackTrace) {
-      logger.e('creating game failed', error, stackTrace);
-      // TODO add user notification
+    createGame(userId).then((data) {
+      final route = GameRoute(data.item1, data.item2);
+      blog.i('navigating to ${route.location}');
+      route.go(context);
     }).whenComplete(() => setState(() {
           _isCreateGameLoading = false;
         }));
@@ -48,11 +36,10 @@ class CreateGameButtonWidgetState extends State<CreateGameButtonWidget> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Consumer<UserIdState>(
-      builder: (context, userIdState, child) => ElevatedButton(
-          onPressed: _isCreateGameLoading
-              ? null
-              : () => _createGamePressed(Payload(userId: userIdState.userId)),
+    return Consumer<UserId>(
+      builder: (context, userId, child) => ElevatedButton(
+          onPressed:
+              _isCreateGameLoading ? null : () => _createGamePressed(userId),
           style: ElevatedButton.styleFrom(
               fixedSize: const Size.fromWidth(500),
               tapTargetSize: MaterialTapTargetSize.padded,

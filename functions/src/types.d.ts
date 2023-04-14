@@ -1,4 +1,5 @@
-declare type MembersModel = { [key: string]: { name: string, isAdmin: boolean } }
+declare type MembersModel = Array<MemberModel>;
+declare type MemberModel = {userId: string, name: string, isAdmin: boolean };
 declare type GameState = {
     userId: string,
 } & GameModel

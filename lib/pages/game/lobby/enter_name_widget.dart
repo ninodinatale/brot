@@ -1,8 +1,8 @@
+import 'package:brot/models/state/game.dart';
+import 'package:brot/models/state/user_member.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../models/state/GameState.dart';
 
 class EnterNameWidget extends StatefulWidget {
   const EnterNameWidget({Key? key}) : super(key: key);
@@ -16,13 +16,13 @@ class _EnterNameWidgetState extends State<EnterNameWidget> {
   bool _isLoading = false;
   bool _isValid = false;
 
-  void _setUserName(GameState game) {
+  void _setUserName(Game game, UserMember userMember) {
     setState(() {
       _isLoading = true;
     });
     FirebaseDatabase.instance
-        .ref('/games/${game.id}/members/${game.userId}/name')
-        .set(_controller.value.text);
+        .ref('/members/${game.key}/${userMember.key}')
+        .update({'name': _controller.value.text});
   }
 
   @override
@@ -33,14 +33,15 @@ class _EnterNameWidgetState extends State<EnterNameWidget> {
 
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
+    _controller.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final gameState = Provider.of<GameState>(context);
+    final game = Provider.of<Game>(context);
+    final userMember = Provider.of<UserMember>(context);
 
     return Row(
       children: [
@@ -60,14 +61,15 @@ class _EnterNameWidgetState extends State<EnterNameWidget> {
             },
             controller: _controller,
             style: theme.textTheme.bodyMedium,
-            decoration: InputDecoration(label: const Text('Dein Name')),
+            decoration: const InputDecoration(label: Text('Dein Name')),
           ),
         ),
         Padding(
           padding: const EdgeInsets.only(left: 8.0),
           child: SizedBox(
             child: FilledButton(
-                onPressed: _isValid ? () => _setUserName(gameState) : null,
+                onPressed:
+                    _isValid ? () => _setUserName(game, userMember) : null,
                 child: _isLoading
                     ? SizedBox(
                         width: 20,

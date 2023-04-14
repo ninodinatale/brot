@@ -7,22 +7,18 @@ part of 'router.dart';
 // **************************************************************************
 
 List<GoRoute> get $appRoutes => [
+      $rootRoute,
       $homeRoute,
+      $gameRoute,
     ];
 
-GoRoute get $homeRoute => GoRouteData.$route(
+GoRoute get $rootRoute => GoRouteData.$route(
       path: '/',
-      factory: $HomeRouteExtension._fromState,
-      routes: [
-        GoRouteData.$route(
-          path: 'game/:gameId',
-          factory: $GameRouteExtension._fromState,
-        ),
-      ],
+      factory: $RootRouteExtension._fromState,
     );
 
-extension $HomeRouteExtension on HomeRoute {
-  static HomeRoute _fromState(GoRouterState state) => const HomeRoute();
+extension $RootRouteExtension on RootRoute {
+  static RootRoute _fromState(GoRouterState state) => const RootRoute();
 
   String get location => GoRouteData.$location(
         '/',
@@ -36,14 +32,39 @@ extension $HomeRouteExtension on HomeRoute {
       context.pushReplacement(location);
 }
 
+GoRoute get $homeRoute => GoRouteData.$route(
+      path: '/home',
+      factory: $HomeRouteExtension._fromState,
+    );
+
+extension $HomeRouteExtension on HomeRoute {
+  static HomeRoute _fromState(GoRouterState state) => const HomeRoute();
+
+  String get location => GoRouteData.$location(
+        '/home',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  void push(BuildContext context) => context.push(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+}
+
+GoRoute get $gameRoute => GoRouteData.$route(
+      path: '/game/:gameKey',
+      factory: $GameRouteExtension._fromState,
+    );
+
 extension $GameRouteExtension on GameRoute {
   static GameRoute _fromState(GoRouterState state) => GameRoute(
-        gameId: state.params['gameId']!,
-        $extra: state.extra as GameState?,
+        state.params['gameKey']!,
+        state.extra as String?,
       );
 
   String get location => GoRouteData.$location(
-        '/game/${Uri.encodeComponent(gameId)}',
+        '/game/${Uri.encodeComponent(gameKey)}',
       );
 
   void go(BuildContext context) => context.go(location, extra: $extra);

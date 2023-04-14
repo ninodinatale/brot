@@ -1,20 +1,28 @@
-import 'package:brot/models/json_serializable/game_model.dart';
+import 'package:brot/main.dart';
 import 'package:brot/pages/game/game_page_widget.dart';
 import 'package:brot/pages/home/home_page_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'models/state/GameState.dart';
-
 part 'router.g.dart';
 
 final router = GoRouter(routes: $appRoutes);
 
-@TypedGoRoute<HomeRoute>(
+@TypedGoRoute<RootRoute>(
   path: '/',
-  routes: [
-    TypedGoRoute<GameRoute>(path: 'game/:gameId'),
-  ],
+)
+@immutable
+class RootRoute extends GoRouteData {
+  const RootRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return SplashScreenWidget();
+  }
+}
+
+@TypedGoRoute<HomeRoute>(
+  path: '/home',
 )
 @immutable
 class HomeRoute extends GoRouteData {
@@ -26,15 +34,18 @@ class HomeRoute extends GoRouteData {
   }
 }
 
+@TypedGoRoute<GameRoute>(
+  path: '/game/:gameKey',
+)
 @immutable
 class GameRoute extends GoRouteData {
-  const GameRoute({required this.gameId, this.$extra});
+  const GameRoute(this.gameKey, [this.$extra]);
 
-  final String gameId;
-  final GameState? $extra;
+  final String gameKey;
+  final String? $extra;
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return GamePageWidget(gameState: $extra);
+    return GamePageWidget(gameKey: gameKey, memberKey: $extra);
   }
 }

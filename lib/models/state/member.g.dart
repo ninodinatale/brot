@@ -1,0 +1,23 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'member.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+Member _$MemberFromJson(Map json) => Member(
+      key: json['key'] as String,
+      userId: json['userId'] as String,
+      isAdmin: json['isAdmin'] as bool? ?? false,
+      name: json['name'] as String,
+      isBread: json['isBread'] as bool? ?? false,
+    );
+
+Map<String, dynamic> _$MemberToJson(Member instance) => <String, dynamic>{
+      'key': instance.key,
+      'userId': instance.userId,
+      'name': instance.name,
+      'isAdmin': instance.isAdmin,
+      'isBread': instance.isBread,
+    };

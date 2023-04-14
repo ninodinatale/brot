@@ -4,12 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
 class Dot3ProgressIndicator extends StatefulWidget {
-  Dot3ProgressIndicator({Key? key, String? prefix, TextStyle? textStyle})
+  Dot3ProgressIndicator(
+      {Key? key,
+      String prefix = '',
+      int numberPeriods = 3,
+      TextStyle? textStyle})
       : _prefix = prefix,
+        _numberPeriods = numberPeriods,
         _textStyle = textStyle,
         super(key: key);
 
-  final String? _prefix;
+  final String _prefix;
+  final int _numberPeriods;
   final TextStyle? _textStyle;
 
   @override
@@ -17,7 +23,7 @@ class Dot3ProgressIndicator extends StatefulWidget {
 }
 
 class _Dot3ProgressIndicatorState extends State<Dot3ProgressIndicator> {
-  String _dots = '...';
+  String _dots = '';
   late Timer _timer;
   final GlobalKey _key = GlobalKey();
   double? _width;
@@ -35,19 +41,22 @@ class _Dot3ProgressIndicatorState extends State<Dot3ProgressIndicator> {
   void initState() {
     super.initState();
 
+    Iterable<int>.generate(widget._numberPeriods).toList().forEach((element) {
+      _dots += '.';
+    });
+
     SchedulerBinding.instance.addPostFrameCallback(_postFrameCallback);
 
     _timer = Timer.periodic(
         const Duration(milliseconds: 500),
         (Timer t) => setState(() {
-              if (_dots.length == 3) {
+              if (_dots.length >= widget._numberPeriods) {
                 _dots = '';
               } else {
                 _dots += '.';
               }
             }));
   }
-
 
   @override
   void dispose() {
@@ -60,11 +69,12 @@ class _Dot3ProgressIndicatorState extends State<Dot3ProgressIndicator> {
     return SizedBox(
       width: _width,
       child: RichText(
-        key: _key,
-        textWidthBasis: TextWidthBasis.longestLine,
-          text: TextSpan(
-              style: widget._textStyle,
-              children: [TextSpan(text: widget._prefix), TextSpan(text: _dots)])),
+          key: _key,
+          textWidthBasis: TextWidthBasis.longestLine,
+          text: TextSpan(style: widget._textStyle, children: [
+            TextSpan(text: widget._prefix),
+            TextSpan(text: _dots)
+          ])),
     );
   }
 }

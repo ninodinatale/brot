@@ -38,23 +38,19 @@ export const createGame = functions
       userId: payload.userId,
       adminUserId: payload.userId,
       status: GameStatus.LOBBY,
-      gameId, members: {
-        [payload.userId]: {
-          name: '_UNSET_',
-          isAdmin: true,
-        },
+      gameId, members: [{
+        userId: payload.userId,
+        name: '_UNSET_',
+        isAdmin: true,
       },
+      ],
     };
 
     const gameModel: GameModel = {
-      adminUserId: payload.userId,
-      status: GameStatus.LOBBY,
-      gameId, members: {
-        [payload.userId]: {
-          name: '_UNSET_',
-          isAdmin: true,
-        },
-      },
+      adminUserId: gameState.userId,
+      status: gameState.status,
+      gameId, members:
+      gameState.members,
     };
 
     // TODO: check if game with same ID does not exist, generate new ID otherwise.
@@ -85,14 +81,15 @@ export const joinGame = functions
     const members: MembersModel = membersSnap.val();
 
     // User was not in this game before, adding them as members
-    if (!members?.[payload.userId]) {
-      const newMember: MembersModel = {
-        [payload.userId]: {
+    if (!members.find((m) => m.userId == payload.userId)) {
+      const newMember: MembersModel = [
+        {
+          userId: payload.userId,
           name: '_UNSET_',
           isAdmin: false,
         },
-      };
-      await membersRef.update(newMember);
+      ];
+      await membersRef.push(newMember);
     }
 
 

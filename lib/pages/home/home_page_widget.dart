@@ -1,10 +1,7 @@
 import 'package:brot/pages/home/create_game_button_widget.dart';
 import 'package:brot/pages/home/join_game_button_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:logger/logger.dart';
-
-final logger = Logger();
+import 'package:flutter_svg/flutter_svg.dart' show SvgPicture;
 
 class HomePageWidget extends StatefulWidget {
   const HomePageWidget({Key? key}) : super(key: key);
@@ -14,6 +11,7 @@ class HomePageWidget extends StatefulWidget {
 }
 
 class HomePageWidgetState extends State<HomePageWidget> {
+  late Future<bool> _isGamePending;
 
   @override
   Widget build(BuildContext context) {

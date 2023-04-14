@@ -1,22 +1,25 @@
-import 'package:brot/firebase_functions.dart';
-import 'package:brot/models/state/UserIdState.dart';
-import 'package:brot/pages/home/home_page_widget.dart';
+import 'package:brot/constants.dart';
+import 'package:brot/models/state/user_id.dart';
 import 'package:brot/router.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 import 'firebase_options.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   if (kDebugMode) {
-    logger.i('using emulators for cloud functions and databse...');
+    blog.i('using emulators for database');
     try {
       // Workaround for https://github.com/firebase/flutterfire/issues/8070
       final emulatorHost =
@@ -24,10 +27,9 @@ void main() async {
               ? '10.0.2.2'
               : 'localhost';
 
-      fbFunctionInstance.useFunctionsEmulator(emulatorHost, 5001);
       FirebaseDatabase.instance.useDatabaseEmulator(emulatorHost, 9000);
     } catch (e) {
-      logger.e(e);
+      blog.e(e);
       return;
     }
   }
@@ -48,23 +50,21 @@ class _MyAppState extends State<MyApp> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-  late Future<String> _userId;
+  late Future<UserId> _userId;
 
   @override
   void initState() {
     super.initState();
-    _userId = _prefs.then((SharedPreferences prefs) {
-      return prefs.getString('userId');
-    }).then((value) {
-      if (value != null) {
-        return Future.value(value);
+    _userId = _prefs.then((SharedPreferences prefs) async {
+      String? userId = prefs.getString('userId');
+
+      if (userId != null) {
+        blog.i('userId available');
       } else {
-        return callFbFunction('generateUserId')
-            .then((value) => value.data as String);
+        blog.i('generating userId');
+        userId = const Uuid().v1();
       }
-    }).then((userId) {
-      _prefs.then((prefs) => prefs.setString('userId', userId)).catchError(
-          (error, stackTrace) => logger.e('failed to save userId to prefs'));
+      blog.i('userId: $userId');
       return userId;
     });
   }
@@ -133,8 +133,8 @@ class _MyAppState extends State<MyApp> {
               if (snapshot.hasError || snapshot.data == null) {
                 return Text('Error: ${snapshot.error}');
               } else {
-                return Provider<UserIdState>(
-                  create: (context) => UserIdState(snapshot.data!),
+                return Provider<UserId>(
+                  create: (context) => snapshot.requireData,
                   child: Scaffold(
                     key: scaffoldKey,
                     body: Container(
@@ -168,5 +168,73 @@ class _MyAppState extends State<MyApp> {
         },
       ),
     );
+  }
+}
+
+class SplashScreenWidget extends StatefulWidget {
+  SplashScreenWidget({super.key});
+
+  @override
+  State<SplashScreenWidget> createState() => _SplashScreenWidget();
+}
+
+class _SplashScreenWidget extends State<SplashScreenWidget> {
+  bool _shouldInitSplash = true;
+
+  void _postFrameCallback(_) {
+    SharedPreferences.getInstance().then((SharedPreferences prefs) async {
+      _shouldInitSplash = false;
+      final pendingGameKey = prefs.getString(PENDING_GAME_PREFS_KEY);
+      if (pendingGameKey != null && pendingGameKey.isNotEmpty) {
+        final userId = context.read<UserId>();
+        blog.i(
+            'pending game with key $pendingGameKey available, getting member key...');
+        final dbSnap = await FirebaseDatabase.instance
+            .ref('members/$pendingGameKey')
+            .orderByChild('userId')
+            .equalTo(userId)
+            .get();
+
+        if (dbSnap.exists) {
+          final memberKey = dbSnap.children.first.key!;
+          blog.i(
+              'member key is $memberKey\nnavigating to game with key $pendingGameKey');
+
+          // ignore: use_build_context_synchronously
+          if (!context.mounted) {
+            const e = 'context not mounted, cannot navigate!';
+            blog.e(e);
+            throw StateError(e);
+          } else {
+            FlutterNativeSplash.remove();
+            // ignore: use_build_context_synchronously
+            GameRoute(pendingGameKey, memberKey).go(context);
+            return;
+          }
+        } else {
+          blog.w(
+              'could not find a member entry for game $pendingGameKey and user $userId\nremoving pending game from cache');
+          await prefs.remove('pendingGameKey');
+        }
+      } else {
+        blog.i('user is not member of an active game');
+      }
+      FlutterNativeSplash.remove();
+      // ignore: use_build_context_synchronously
+      const HomeRoute().go(context);
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_shouldInitSplash) {
+      SchedulerBinding.instance.addPostFrameCallback(_postFrameCallback);
+    }
+    return Container();
   }
 }

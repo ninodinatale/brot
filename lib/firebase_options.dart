@@ -52,7 +52,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '157424518991',
     projectId: 'who-is-the-bread',
     authDomain: 'who-is-the-bread.firebaseapp.com',
-    databaseURL: 'https://who-is-the-bread-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://who-is-the-bread-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'who-is-the-bread.appspot.com',
     measurementId: 'G-VM425S4ZMY',
   );
@@ -62,7 +63,8 @@ class DefaultFirebaseOptions {
     appId: '1:157424518991:android:7ae0c70d48cadace93273a',
     messagingSenderId: '157424518991',
     projectId: 'who-is-the-bread',
-    databaseURL: 'https://who-is-the-bread-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://who-is-the-bread-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'who-is-the-bread.appspot.com',
   );
 
@@ -71,10 +73,13 @@ class DefaultFirebaseOptions {
     appId: '1:157424518991:ios:f5d4c5206e77cc9593273a',
     messagingSenderId: '157424518991',
     projectId: 'who-is-the-bread',
-    databaseURL: 'https://who-is-the-bread-default-rtdb.europe-west1.firebasedatabase.app',
+    databaseURL:
+        'https://who-is-the-bread-default-rtdb.europe-west1.firebasedatabase.app',
     storageBucket: 'who-is-the-bread.appspot.com',
-    androidClientId: '157424518991-2ie1h3d15o9rjhcrmaqj913a8hptolvk.apps.googleusercontent.com',
-    iosClientId: '157424518991-bnq4q9toommr61u8ba0lb0dlrpgith4h.apps.googleusercontent.com',
+    androidClientId:
+        '157424518991-2ie1h3d15o9rjhcrmaqj913a8hptolvk.apps.googleusercontent.com',
+    iosClientId:
+        '157424518991-bnq4q9toommr61u8ba0lb0dlrpgith4h.apps.googleusercontent.com',
     iosBundleId: 'com.example.brot',
   );
 }

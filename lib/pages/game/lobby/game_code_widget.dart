@@ -1,11 +1,14 @@
+import 'dart:async';
+
+import 'package:brot/database.dart';
+import 'package:brot/models/state/game.dart';
+import 'package:brot/models/state/user_member.dart';
 import 'package:brot/router.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animator/flutter_animator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-
-import '../../models/state/GameState.dart';
 
 class GameCodeWidget extends StatefulWidget {
   const GameCodeWidget({Key? key}) : super(key: key);
@@ -15,17 +18,48 @@ class GameCodeWidget extends StatefulWidget {
 }
 
 class _GameCodeWidgetState extends State<GameCodeWidget> {
-  void leaveGame(GameState game) {
-    FirebaseDatabase.instance
-        .ref('/games/${game.id}/members/${game.userId}')
-        .remove();
+  var _isStartGameLoading = false;
+
+  Widget get _startGameButtonChild {
+    return _isStartGameLoading
+        ? SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              color: Theme.of(context).colorScheme.onPrimary,
+            ))
+        : const Text('Start');
+  }
+
+  /// Leaves the game as member.
+  void _leaveGame(String gameKey, String memberKey) {
+    FirebaseDatabase.instance.ref('/members/$gameKey/$memberKey').remove();
     const HomeRoute().go(context);
+  }
+
+  /// Starts the game.
+  void _startGame(Game game) {
+    setState(() {
+      _isStartGameLoading = true;
+    });
+    FirebaseDatabase.instance
+        .ref('/games/${game.key}/status')
+        .set(GameStatus.choosingBread.index)
+        .then((_) async {
+      await chooseBread(game.key);
+      return Timer(const Duration(seconds: 5), () {
+        FirebaseDatabase.instance
+            .ref('/games/${game.key}/status')
+            .set(GameStatus.playing.index);
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final gameState = Provider.of<GameState>(context);
+    final game = Provider.of<Game>(context);
+    final userMember = Provider.of<UserMember>(context);
 
     return Column(
       children: [
@@ -35,7 +69,7 @@ class _GameCodeWidgetState extends State<GameCodeWidget> {
                   offset: Duration(seconds: 2),
                   magnitude: 10,
                   autoPlay: AnimationPlayStates.Loop),
-              child: Text(gameState.id.toString(),
+              child: Text(game.gameCode,
                   style: theme.textTheme.displaySmall
                       ?.copyWith(color: theme.colorScheme.primary))),
         ),
@@ -56,7 +90,8 @@ class _GameCodeWidgetState extends State<GameCodeWidget> {
                                       child: const Text('Abbrechen'),
                                     ),
                                     TextButton(
-                                      onPressed: () => leaveGame(gameState),
+                                      onPressed: () =>
+                                          _leaveGame(game.key, userMember.key),
                                       child: Text('Verlassen',
                                           style: TextStyle(
                                               color: theme.colorScheme.error)),
@@ -65,7 +100,9 @@ class _GameCodeWidgetState extends State<GameCodeWidget> {
                                 )),
                       },
                   child: const Text('Verlassen')),
-              ElevatedButton(onPressed: () => {}, child: const Text('Start'))
+              ElevatedButton(
+                  onPressed: () => _startGame(game),
+                  child: _startGameButtonChild)
             ],
           ),
         )
