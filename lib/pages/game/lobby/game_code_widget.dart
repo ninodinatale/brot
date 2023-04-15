@@ -63,7 +63,7 @@ class _GameCodeWidgetState extends State<GameCodeWidget> {
       logI('generating artificial loading time of {}', ['$waitDuration']);
       return Timer(waitDuration, () {
         logI('artificial loading time over');
-        const playingGameStatus = GameStatus.playing;
+        const playingGameStatus = GameStatus.votingWords;
         logI('setting game.status to {}', ['$playingGameStatus']);
         FirebaseDatabase.instance
             .ref('/games/${game.key}/status')

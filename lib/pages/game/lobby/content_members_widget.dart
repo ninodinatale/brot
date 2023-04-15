@@ -8,16 +8,16 @@ import 'package:flutter/material.dart';
 
 import '../../../logger.dart';
 
-class MembersWidget extends StatefulWidget {
-  const MembersWidget(this.gameKey, {Key? key}) : super(key: key);
+class ContentMembersWidget extends StatefulWidget {
+  const ContentMembersWidget(this.gameKey, {Key? key}) : super(key: key);
 
   final String gameKey;
 
   @override
-  State<MembersWidget> createState() => _MembersWidgetState();
+  State<ContentMembersWidget> createState() => _ContentMembersWidgetState();
 }
 
-class _MembersWidgetState extends State<MembersWidget> {
+class _ContentMembersWidgetState extends State<ContentMembersWidget> {
   final _list = GlobalKey<AnimatedListStateOf<Member>>();
   late List<StreamSubscription> _subs;
 

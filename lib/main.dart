@@ -101,7 +101,7 @@ class _MyAppState extends State<MyApp> {
           displayMedium:
               TextStyle(fontWeight: FontWeight.bold, letterSpacing: -5),
           displaySmall:
-              TextStyle(fontWeight: FontWeight.bold, letterSpacing: -5),
+              TextStyle(fontWeight: FontWeight.bold, letterSpacing: -1, fontSize: 32),
           //   titleLarge: TextStyle(
           //       fontSize: 48.0, fontWeight: FontWeight.bold, letterSpacing: -1),
           //   titleMedium: TextStyle(

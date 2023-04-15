@@ -6,13 +6,15 @@ import 'package:brot/models/state/user_id.dart';
 import 'package:brot/models/state/user_member.dart';
 import 'package:brot/models/state/word.dart';
 import 'package:brot/pages/game/header_widget.dart';
+import 'package:brot/pages/game/voting_words/is_bread_voting_words_content_widget.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animator/widgets/animator_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
 import '../../logger.dart';
-import 'lobby/members_widget.dart';
+import 'lobby/content_members_widget.dart';
 
 class GamePageWidget extends StatefulWidget {
   const GamePageWidget({Key? key, required this.gameKey, this.memberKey})
@@ -106,14 +108,16 @@ class _GamePageWidgetState extends State<GamePageWidget> {
     }).asBroadcastStream();
   }
 
-  Widget _gameContentBuilder(BuildContext context, GameStatus status) {
+  Widget _gameContentBuilder(
+      BuildContext context, GameStatus status, UserMember userMember) {
     switch (status) {
       case GameStatus.lobby:
       case GameStatus.choosingBread:
-        return MembersWidget(widget.gameKey);
+        return ContentMembersWidget(widget.gameKey);
       case GameStatus.votingWords:
-        // TODO: Handle this case.
-        return Text('UNIMPL');
+        return userMember.isBread
+            ? const IsBreadVotingWordsContentWidget()
+            : Text('IS NOT BREAD UNIMPL');
       case GameStatus.playing:
         // TODO: Handle this case.
         return Text('UNIMPL');
@@ -140,33 +144,14 @@ class _GamePageWidgetState extends State<GamePageWidget> {
                     initialData: snapshot.requireData.item1.status,
                     create: (context) => _changedGameStatusStream),
                 StreamProvider<UserHasWord>(
-                    initialData: false, create: (context) => _userHasWordStream)
+                    initialData: false, create: (context) => _userHasWordStream),
+                Provider<GlobalKey<AnimatorWidgetState>>(
+                  create: (context) => GlobalKey<AnimatorWidgetState>(),
+                )
               ],
               builder: (context, child) => Column(
                 children: [
-                  Material(
-                      color: Colors.transparent,
-                      elevation: 20.0,
-                      shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(20.0),
-                          bottomRight: Radius.circular(20.0),
-                          topLeft: Radius.circular(0.0),
-                          topRight: Radius.circular(0.0),
-                        ),
-                      ),
-                      child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          decoration: BoxDecoration(
-                            color: theme.scaffoldBackgroundColor,
-                            borderRadius: const BorderRadius.only(
-                              bottomLeft: Radius.circular(40),
-                              bottomRight: Radius.circular(40),
-                              topLeft: Radius.circular(0.0),
-                              topRight: Radius.circular(0.0),
-                            ),
-                          ),
-                          child: const HeaderWidget())),
+                  HeaderWidget(),
                   Expanded(
                     child: Padding(
                         padding: const EdgeInsets.all(20), child: child),
@@ -174,8 +159,9 @@ class _GamePageWidgetState extends State<GamePageWidget> {
                 ],
               ),
               child: Consumer<GameStatus>(
-                builder: (context, status, child) =>
-                    _gameContentBuilder(context, status),
+                builder: (context, status, child) => Consumer<UserMember>(
+                    builder: (context, userMember, child) =>
+                        _gameContentBuilder(context, status, userMember)),
               ),
             );
           } else {

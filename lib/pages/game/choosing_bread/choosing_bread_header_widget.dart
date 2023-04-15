@@ -16,35 +16,32 @@ class ChoosingBreadHeaderWidget extends StatelessWidget {
         color: theme.primaryColor,
         fontSize: theme.textTheme.titleLarge!.fontSize! * 2);
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(10, 40, 10, 20),
-        child: Column(
-          children: [
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '🤫',
-                  style: styleIcons,
-                ),
-                SvgPicture.asset('assets/images/bread.svg',
-                    height: styleIcons.fontSize),
-              ],
-            ),
-            Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Brot wird ausgewählt',
-                  style: styleText,
-                ),
-                Dot3ProgressIndicator(textStyle: styleText),
-              ],
-            ),
-          ],
-        ),
+      child: Column(
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                '🤫',
+                style: styleIcons,
+              ),
+              SvgPicture.asset('assets/images/bread.svg',
+                  height: styleIcons.fontSize),
+            ],
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Brot wird ausgewählt',
+                style: styleText,
+              ),
+              Dot3ProgressIndicator(textStyle: styleText),
+            ],
+          ),
+        ],
       ),
     );
   }
