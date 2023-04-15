@@ -5,6 +5,8 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../constants.dart';
+
 class EnterWordWidget extends StatefulWidget {
   const EnterWordWidget({Key? key}) : super(key: key);
 
@@ -18,6 +20,8 @@ class _EnterWordWidgetState extends State<EnterWordWidget> {
   bool _isValid = false;
 
   void _setWord(Game game, String userId) {
+    blog.i(
+        'setting word ${_controller.value.text} for game $game with userId $userId');
     setState(() {
       _isLoading = true;
     });
@@ -73,7 +77,7 @@ class _EnterWordWidgetState extends State<EnterWordWidget> {
           padding: const EdgeInsets.only(left: 8.0),
           child: FilledButton(
               onPressed: _isValid ? () => _setWord(game, userId) : null,
-              child: !_isLoading
+              child: _isLoading
                   ? SizedBox(
                       height: 20,
                       width: 20,

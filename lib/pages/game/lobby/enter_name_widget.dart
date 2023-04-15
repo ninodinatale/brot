@@ -1,3 +1,4 @@
+import 'package:brot/constants.dart';
 import 'package:brot/models/state/game.dart';
 import 'package:brot/models/state/user_member.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -17,6 +18,7 @@ class _EnterNameWidgetState extends State<EnterNameWidget> {
   bool _isValid = false;
 
   void _setUserName(Game game, UserMember userMember) {
+    blog.i('set name for member $userMember to ${_controller.value.text} for game $game');
     setState(() {
       _isLoading = true;
     });

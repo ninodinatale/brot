@@ -28,17 +28,24 @@ class _MembersWidgetState extends State<MembersWidget> {
           .ref('/members/${widget.gameKey}')
           .onChildAdded
           .listen((event) {
+        blog.i(
+            'onChildAdded fired for path /members/${widget.gameKey} with value ${event.snapshot.value}');
         _list.currentState
             ?.insert(Member.fromJson(event.snapshot.value as Map));
       }),
       FirebaseDatabase.instance
           .ref('/members/${widget.gameKey}')
           .onChildRemoved
-          .listen((event) {}),
+          .listen((event) {
+        blog.i(
+            'onChildRemoved fired for path /members/${widget.gameKey} with value ${event.snapshot.value}');
+      }),
       FirebaseDatabase.instance
           .ref('/members/${widget.gameKey}')
           .onChildChanged
           .listen((event) {
+        blog.i(
+            'onChildChanged fired for path /members/${widget.gameKey} with value ${event.snapshot.value}');
         final changedMember = Member.fromJson(event.snapshot.value as Map);
         final index = _list.currentState?.items.indexWhere(
             (existingMember) => existingMember.key == changedMember.key);

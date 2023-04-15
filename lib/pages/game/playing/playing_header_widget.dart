@@ -12,7 +12,6 @@ class PlayingHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final gameKey = Provider.of<Game>(context).key;
     final userId = Provider.of<UserId>(context);
     return Padding(
@@ -26,9 +25,9 @@ class PlayingHeaderWidget extends StatelessWidget {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               if (snapshot.requireData.exists) {
-                return Center(
+                return const Center(
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: EdgeInsets.all(8.0),
                     child: Text('???'),
                   ),
                 );

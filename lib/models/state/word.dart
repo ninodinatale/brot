@@ -24,3 +24,6 @@ class Word {
     return toJson().toString();
   }
 }
+
+typedef AddedWord = Word;
+typedef UserHasWord = bool;

@@ -20,7 +20,6 @@ class _MembersWidgetState extends State<MembersWidget> {
   final _listKey = GlobalKey<AnimatedListStateOf<Member>>();
   late AnimatedListStateOf<Member> _list;
 
-  // late AnimatedListOf<Member> _list;
   late List<StreamSubscription> _subs;
 
   @override
@@ -32,16 +31,24 @@ class _MembersWidgetState extends State<MembersWidget> {
           .ref('/members/${widget.gameKey}')
           .onChildAdded
           .listen((event) {
+        blog.i(
+            'onChildAdded fired for path /members/${widget.gameKey} with value ${event.snapshot.value}');
         _list.insert(Member.fromJson(event.snapshot.value as Map));
       }),
       FirebaseDatabase.instance
           .ref('/members/${widget.gameKey}')
           .onChildRemoved
-          .listen((event) {}),
+          .listen((event) {
+        blog.i(
+            'onChildRemoved fired for path /members/${widget.gameKey} with value ${event.snapshot.value}');
+      }),
       FirebaseDatabase.instance
           .ref('/members/${widget.gameKey}')
           .onChildChanged
           .listen((event) {
+        blog.i(
+            'onChildChanged fired for path /members/${widget.gameKey} with value ${event.snapshot.value}');
+        _list.insert(Member.fromJson(event.snapshot.value as Map));
         final changedMember = Member.fromJson(event.snapshot.value as Map);
         final index = _list.items.indexWhere(
             (existingMember) => existingMember.key == changedMember.key);

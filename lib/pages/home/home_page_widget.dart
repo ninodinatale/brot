@@ -11,8 +11,6 @@ class HomePageWidget extends StatefulWidget {
 }
 
 class HomePageWidgetState extends State<HomePageWidget> {
-  late Future<bool> _isGamePending;
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);

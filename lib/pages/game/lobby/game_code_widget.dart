@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:brot/database.dart';
 import 'package:brot/models/state/game.dart';
+import 'package:brot/models/state/member.dart';
 import 'package:brot/models/state/user_member.dart';
 import 'package:brot/router.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -9,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animator/flutter_animator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+
+import '../../../constants.dart';
 
 class GameCodeWidget extends StatefulWidget {
   const GameCodeWidget({Key? key}) : super(key: key);
@@ -32,25 +35,39 @@ class _GameCodeWidgetState extends State<GameCodeWidget> {
   }
 
   /// Leaves the game as member.
-  void _leaveGame(String gameKey, String memberKey) {
-    FirebaseDatabase.instance.ref('/members/$gameKey/$memberKey').remove();
-    const HomeRoute().go(context);
+  void _leaveGame(Game game, Member member) {
+    blog.i('leaving game $game for member $member');
+    FirebaseDatabase.instance
+        .ref('/members/${game.key}/${member.key}')
+        .remove();
+
+    const route = HomeRoute();
+    blog.i('navigating to ${route.location}');
+    route.go(context);
   }
 
   /// Starts the game.
   void _startGame(Game game) {
+    blog.i('starting game $game');
     setState(() {
       _isStartGameLoading = true;
     });
+    const newGameStatus = GameStatus.choosingBread;
+    blog.i('setting game.status to $newGameStatus');
     FirebaseDatabase.instance
         .ref('/games/${game.key}/status')
-        .set(GameStatus.choosingBread.index)
+        .set(newGameStatus.index)
         .then((_) async {
       await chooseBread(game.key);
-      return Timer(const Duration(seconds: 5), () {
+      const waitDuration = Duration(seconds: 5);
+      blog.i('generating artificial loading time of $waitDuration');
+      return Timer(waitDuration, () {
+        blog.i('artificial loading time over');
+        const playingGameStatus = GameStatus.playing;
+        blog.i('setting game.status to $playingGameStatus');
         FirebaseDatabase.instance
             .ref('/games/${game.key}/status')
-            .set(GameStatus.playing.index);
+            .set(playingGameStatus.index);
       });
     });
   }
@@ -91,7 +108,7 @@ class _GameCodeWidgetState extends State<GameCodeWidget> {
                                     ),
                                     TextButton(
                                       onPressed: () =>
-                                          _leaveGame(game.key, userMember.key),
+                                          _leaveGame(game, userMember),
                                       child: Text('Verlassen',
                                           style: TextStyle(
                                               color: theme.colorScheme.error)),
