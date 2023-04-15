@@ -11,7 +11,7 @@ import 'package:flutter_animator/flutter_animator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../../../constants.dart';
+import '../../../logger.dart';
 
 class GameCodeWidget extends StatefulWidget {
   const GameCodeWidget({Key? key}) : super(key: key);
@@ -36,35 +36,35 @@ class _GameCodeWidgetState extends State<GameCodeWidget> {
 
   /// Leaves the game as member.
   void _leaveGame(Game game, Member member) {
-    blog.i('leaving game $game for member $member');
+    logI('leaving game {} for member {}', ['$game', '$member']);
     FirebaseDatabase.instance
         .ref('/members/${game.key}/${member.key}')
         .remove();
 
     const route = HomeRoute();
-    blog.i('navigating to ${route.location}');
+    logI('navigating to {}', ['${route.location}']);
     route.go(context);
   }
 
   /// Starts the game.
   void _startGame(Game game) {
-    blog.i('starting game $game');
+    logI('starting game {}', ['$game']);
     setState(() {
       _isStartGameLoading = true;
     });
     const newGameStatus = GameStatus.choosingBread;
-    blog.i('setting game.status to $newGameStatus');
+    logI('setting game.status to {}', ['$newGameStatus']);
     FirebaseDatabase.instance
         .ref('/games/${game.key}/status')
         .set(newGameStatus.index)
         .then((_) async {
       await chooseBread(game.key);
       const waitDuration = Duration(seconds: 5);
-      blog.i('generating artificial loading time of $waitDuration');
+      logI('generating artificial loading time of {}', ['$waitDuration']);
       return Timer(waitDuration, () {
-        blog.i('artificial loading time over');
+        logI('artificial loading time over');
         const playingGameStatus = GameStatus.playing;
-        blog.i('setting game.status to $playingGameStatus');
+        logI('setting game.status to {}', ['$playingGameStatus']);
         FirebaseDatabase.instance
             .ref('/games/${game.key}/status')
             .set(playingGameStatus.index);

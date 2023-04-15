@@ -13,6 +13,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
 import 'firebase_options.dart';
+import 'logger.dart';
 
 void main() async {
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +24,7 @@ void main() async {
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
 
   if (kDebugMode) {
-    blog.i('using emulators for database');
+    logI('using emulators for database');
     try {
       // Workaround for https://github.com/firebase/flutterfire/issues/8070
       final emulatorHost =
@@ -63,12 +64,12 @@ class _MyAppState extends State<MyApp> {
       String? userId = prefs.getString('userId');
 
       if (userId != null) {
-        blog.i('userId available');
+        logI('userId available');
       } else {
-        blog.i('generating userId');
+        logI('generating userId');
         userId = const Uuid().v1();
       }
-      blog.i('userId: $userId');
+      logI('userId is {}', ['$userId']);
       return userId;
     });
   }
@@ -191,8 +192,8 @@ class _SplashScreenWidget extends State<SplashScreenWidget> {
       final pendingGameKey = prefs.getString(PENDING_GAME_PREFS_KEY);
       if (pendingGameKey != null && pendingGameKey.isNotEmpty) {
         final userId = context.read<UserId>();
-        blog.i(
-            'pending game with key $pendingGameKey available, getting member key...');
+        logI('pending game with key {} available, getting member key...',
+            ['$pendingGameKey']);
         final dbSnap = await FirebaseDatabase.instance
             .ref('members/$pendingGameKey')
             .orderByChild('userId')
@@ -201,8 +202,8 @@ class _SplashScreenWidget extends State<SplashScreenWidget> {
 
         if (dbSnap.exists) {
           final memberKey = dbSnap.children.first.key!;
-          blog.i(
-              'member key is $memberKey\nnavigating to game with key $pendingGameKey');
+          logI('member key is {}\nnavigating to game with key {}',
+              ['$memberKey', '$pendingGameKey']);
 
           // ignore: use_build_context_synchronously
           if (!context.mounted) {
@@ -221,7 +222,7 @@ class _SplashScreenWidget extends State<SplashScreenWidget> {
           await prefs.remove('pendingGameKey');
         }
       } else {
-        blog.i('user is not member of an active game');
+        logI('user is not member of an active game');
       }
       FlutterNativeSplash.remove();
       // ignore: use_build_context_synchronously

@@ -1,9 +1,9 @@
-import 'package:brot/constants.dart';
 import 'package:brot/database.dart';
 import 'package:brot/models/state/user_id.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../logger.dart';
 import '../../router.dart';
 
 class CreateGameButtonWidget extends StatefulWidget {
@@ -25,7 +25,7 @@ class CreateGameButtonWidgetState extends State<CreateGameButtonWidget> {
 
     createGame(userId).then((data) {
       final route = GameRoute(data.item1, data.item2);
-      blog.i('navigating to ${route.location}');
+      logI('navigating to ', ['${route.location}']);
       route.go(context);
     }).whenComplete(() => setState(() {
           _isCreateGameLoading = false;

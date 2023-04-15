@@ -1,11 +1,12 @@
 import 'dart:async';
 
-import 'package:brot/constants.dart';
 import 'package:brot/models/state/member.dart';
 import 'package:brot/widgets/brot_animated_list.dart';
 import 'package:brot/widgets/dot3_progress_indicator.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+
+import '../../../logger.dart';
 
 class MembersWidget extends StatefulWidget {
   const MembersWidget(this.gameKey, {Key? key}) : super(key: key);
@@ -31,23 +32,23 @@ class _MembersWidgetState extends State<MembersWidget> {
           .ref('/members/${widget.gameKey}')
           .onChildAdded
           .listen((event) {
-        blog.i(
-            'onChildAdded fired for path /members/${widget.gameKey} with value ${event.snapshot.value}');
+        logI('onChildAdded fired for path {} with value {}',
+            ['/members/${widget.gameKey}', '${event.snapshot.value}']);
         _list.insert(Member.fromJson(event.snapshot.value as Map));
       }),
       FirebaseDatabase.instance
           .ref('/members/${widget.gameKey}')
           .onChildRemoved
           .listen((event) {
-        blog.i(
-            'onChildRemoved fired for path /members/${widget.gameKey} with value ${event.snapshot.value}');
+        logI('onChildRemoved fired for path {} with value {}',
+            ['/members/${widget.gameKey}', '${event.snapshot.value}']);
       }),
       FirebaseDatabase.instance
           .ref('/members/${widget.gameKey}')
           .onChildChanged
           .listen((event) {
-        blog.i(
-            'onChildChanged fired for path /members/${widget.gameKey} with value ${event.snapshot.value}');
+        logI('onChildChanged fired for path {} with value {}',
+            ['/members/${widget.gameKey}', '${event.snapshot.value}']);
         _list.insert(Member.fromJson(event.snapshot.value as Map));
         final changedMember = Member.fromJson(event.snapshot.value as Map);
         final index = _list.items.indexWhere(

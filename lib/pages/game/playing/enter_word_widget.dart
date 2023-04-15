@@ -5,7 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../constants.dart';
+import '../../../logger.dart';
 
 class EnterWordWidget extends StatefulWidget {
   const EnterWordWidget({Key? key}) : super(key: key);
@@ -20,8 +20,8 @@ class _EnterWordWidgetState extends State<EnterWordWidget> {
   bool _isValid = false;
 
   void _setWord(Game game, String userId) {
-    blog.i(
-        'setting word ${_controller.value.text} for game $game with userId $userId');
+    logI('setting word {} for game {} with userId {}',
+        ['${_controller.value.text}', '$game', '$userId']);
     setState(() {
       _isLoading = true;
     });

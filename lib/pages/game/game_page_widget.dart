@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:brot/constants.dart';
 import 'package:brot/models/state/game.dart';
 import 'package:brot/models/state/member.dart';
 import 'package:brot/models/state/user_id.dart';
@@ -12,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
+import '../../logger.dart';
 import 'lobby/members_widget.dart';
 
 class GamePageWidget extends StatefulWidget {
@@ -43,24 +43,27 @@ class _GamePageWidgetState extends State<GamePageWidget> {
         .ref('/games/${widget.gameKey}')
         .onValue
         .map((event) {
-      blog.i(
-          'onValue fired for path /games/${widget.gameKey} with value ${event.snapshot.value}');
+      logI('onValue fired for path {} with value {}',
+          ['/games/${widget.gameKey}', '${event.snapshot.value}']);
+
       return Game.fromJson(event.snapshot.value as Map);
     }).asBroadcastStream();
     _valueUserMemberStream = FirebaseDatabase.instance
         .ref('/members/${widget.gameKey}/${widget.memberKey}')
         .onValue
         .map((event) {
-      blog.i(
-          'onValue fired for path /members/${widget.gameKey}/${widget.memberKey} with value ${event.snapshot.value}');
+      logI('onValue fired for path {} with value {}', [
+        '/members/${widget.gameKey}/${widget.memberKey}',
+        '${event.snapshot.value}'
+      ]);
       return UserMember.fromJson(event.snapshot.value as Map);
     }).asBroadcastStream();
     _userHasWordStream = FirebaseDatabase.instance
         .ref('/members/${widget.gameKey}')
         .onChildAdded
         .map((event) {
-      blog.i(
-          'onChildAdded fired for path /members/${widget.gameKey} with value ${event.snapshot.value}');
+      logI('onChildAdded fired for path {} with value {}',
+          ['/members/${widget.gameKey}', '${event.snapshot.value}']);
       return Word.fromJson(event.snapshot.value as Map).userId ==
           Provider.of<UserId>(context);
     }).asBroadcastStream();
@@ -68,8 +71,8 @@ class _GamePageWidgetState extends State<GamePageWidget> {
         .ref('/games/${widget.gameKey}')
         .onChildChanged
         .asyncMap((event) {
-      blog.i(
-          'onChildChanged fired for path /games/${widget.gameKey} with value ${event.snapshot.value}');
+      logI('onChildChanged fired for path {} with value {}',
+          ['/games/${widget.gameKey}', '${event.snapshot.value}']);
       return event.snapshot.ref.parent!.get();
     }).map((event) {
       return Game.firstFromJson(event.value as Map);
@@ -78,8 +81,8 @@ class _GamePageWidgetState extends State<GamePageWidget> {
         .ref('/games/${widget.gameKey}/status')
         .onValue
         .map((event) {
-      blog.i(
-          'onValue fired for path /games/${widget.gameKey}/status with value ${event.snapshot.value}');
+      logI('onValue fired for path {} with value {}',
+          ['/games/${widget.gameKey}/status', '${event.snapshot.value}']);
       if (event.snapshot.value is int) {
         return GameStatus.values[event.snapshot.value as int];
       } else {
@@ -93,8 +96,10 @@ class _GamePageWidgetState extends State<GamePageWidget> {
         .ref('/members/${widget.gameKey}/${widget.memberKey}')
         .onChildChanged
         .asyncMap((event) {
-      blog.i(
-          'onChildChanged fired for path /members/${widget.gameKey}/${widget.memberKey} with value ${event.snapshot.value}');
+      logI('onChildChanged fired for path {} with value {}', [
+        '/members/${widget.gameKey}/${widget.memberKey}',
+        '${event.snapshot.value}'
+      ]);
       return event.snapshot.ref.parent!.get();
     }).map((event) {
       return UserMember.firstFromJson(event.value as Map);

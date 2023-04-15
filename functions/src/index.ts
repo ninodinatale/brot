@@ -50,7 +50,7 @@ export const createGame = functions
       adminUserId: gameState.userId,
       status: gameState.status,
       gameId, members:
-      gameState.members,
+            gameState.members,
     };
 
     // TODO: check if game with same ID does not exist, generate new ID otherwise.

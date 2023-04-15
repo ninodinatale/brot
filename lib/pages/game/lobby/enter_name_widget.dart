@@ -1,9 +1,10 @@
-import 'package:brot/constants.dart';
 import 'package:brot/models/state/game.dart';
 import 'package:brot/models/state/user_member.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../../../logger.dart';
 
 class EnterNameWidget extends StatefulWidget {
   const EnterNameWidget({Key? key}) : super(key: key);
@@ -18,7 +19,8 @@ class _EnterNameWidgetState extends State<EnterNameWidget> {
   bool _isValid = false;
 
   void _setUserName(Game game, UserMember userMember) {
-    blog.i('set name for member $userMember to ${_controller.value.text} for game $game');
+    logI('set name for member {} to {} for game {}',
+        ['$userMember', '${_controller.value.text}', '$game']);
     setState(() {
       _isLoading = true;
     });

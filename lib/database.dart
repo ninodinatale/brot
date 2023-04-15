@@ -7,13 +7,15 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tuple/tuple.dart';
 
+import 'logger.dart';
+
 ///
 /// Creates a game and joins it.
 ///
 /// Returns the key of the created game.
 ///
 Future<Tuple2<String, String>> createGame(String userId) async {
-  blog.i('creating game for user $userId');
+  logI('creating game for user {}', [userId]);
 
   var gameCode = '';
   while (gameCode == '') {
@@ -33,7 +35,7 @@ Future<Tuple2<String, String>> createGame(String userId) async {
     }
   }
 
-  blog.i('game code will be $gameCode');
+  logI('game code will be {}', [gameCode]);
 
   final newGameRef = FirebaseDatabase.instance.ref('/games').push();
   final newGame = Game(
@@ -45,7 +47,7 @@ Future<Tuple2<String, String>> createGame(String userId) async {
   late String memberKey;
 
   await newGameRef.set(newGame.toJson()).then((value) {
-    blog.i('game $newGame created');
+    logI('game {} created', ['$newGame']);
   }).then((value) async {
     memberKey = (await _createMember(
             gameKey: newGameRef.key!, userId: userId, isAdmin: true))
@@ -65,7 +67,7 @@ Future<Tuple2<String, String>> createGame(String userId) async {
 /// does not exist.
 ///
 Future<Tuple2<String, String>> joinGame(String userId, String gameCode) async {
-  blog.i('try joining game with code $gameCode for user $userId');
+  logI('try joining game with code {} for user with id {}', [gameCode, userId]);
 
   final gameQuery = FirebaseDatabase.instance
       .ref()
@@ -76,14 +78,14 @@ Future<Tuple2<String, String>> joinGame(String userId, String gameCode) async {
   final gameSnap = (await gameQuery.once()).snapshot;
 
   if (!gameSnap.exists) {
-    blog.i('game with code $gameCode does not exist, returning error');
+    logI('game with code {} does not exist, returning error', [gameCode]);
     return Future.error({'code': ErrorCodes.gameNotFound});
   }
 
   final game = Game.firstFromJson(gameSnap.value as Map);
 
   if (game.status != GameStatus.lobby) {
-    blog.i('game $game has already started, cannot join');
+    logI('game {} has already started, cannot join', ['$game']);
     return Future.error({'code': ErrorCodes.gameAlreadyStarted});
   }
 
@@ -102,7 +104,7 @@ Future<Tuple2<String, String>> joinGame(String userId, String gameCode) async {
   } else {
     memberKey =
         Member.fromJson((existingMemberSnap.value as Map).values.first).key;
-    blog.i('user already exists as member; nothing to do');
+    logI('user already exists as member; nothing to do');
   }
 
   return Tuple2(gameKey, memberKey);
@@ -112,7 +114,7 @@ Future<Tuple2<String, String>> joinGame(String userId, String gameCode) async {
 /// Chooses a bread randomly from the members of the game with [gameKey] key.
 ///
 Future<void> chooseBread(String gameKey) async {
-  blog.i('choosing bread for game with key $gameKey');
+  logI('choosing bread for game with key {}', [gameKey]);
 
   final gameSnap =
       await FirebaseDatabase.instance.ref().child('/games/$gameKey').get();
@@ -140,19 +142,19 @@ Future<void> chooseBread(String gameKey) async {
   final allMembers = gameMembersSnap.children
       .map((membersSnap) => Member.fromJson(membersSnap.value as Map))
       .toList();
-  blog.i('selecting from ${allMembers.length} members a bread randomly');
+  logI('selecting from {} members a bread randomly', ['${allMembers.length}']);
 
   final randomIndex = Random().nextInt(allMembers.length);
   final breadMember = allMembers[randomIndex];
 
-  blog.i('random index is $randomIndex');
+  logI('random index is ', ['$randomIndex']);
 
   await FirebaseDatabase.instance
       .ref()
       .child('/members/$gameKey/${breadMember.key}/isBread')
       .set(true);
 
-  blog.i('member $breadMember will be the bread');
+  logI('member {} will be the bread', ['$breadMember']);
 }
 
 ///
@@ -166,14 +168,14 @@ Future<Member> _createMember(
     {required String userId,
     required String gameKey,
     required bool isAdmin}) async {
-  blog.i('creating member');
+  logI('creating member');
   final newMemberRef =
       FirebaseDatabase.instance.ref('/members/$gameKey').push();
 
   final newMember = Member(
       key: newMemberRef.key!, userId: userId, isAdmin: isAdmin, name: '');
   await newMemberRef.set(newMember.toJson());
-  blog.i('member $newMember created');
+  logI('member {} created', ['$newMember']);
 
   SharedPreferences.getInstance()
       .then((prefs) => prefs.setString(PENDING_GAME_PREFS_KEY, gameKey));
