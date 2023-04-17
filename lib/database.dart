@@ -3,11 +3,13 @@ import 'dart:math';
 import 'package:brot/constants.dart';
 import 'package:brot/models/state/game.dart';
 import 'package:brot/models/state/member.dart';
+import 'package:brot/models/state/word.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tuple/tuple.dart';
 
 import 'logger.dart';
+import 'models/state/user_id.dart';
 
 ///
 /// Creates a game and joins it.
@@ -53,7 +55,7 @@ Future<Tuple2<String, String>> createGame(String userId) async {
             gameKey: newGameRef.key!, userId: userId, isAdmin: true))
         .key;
   }).catchError((error, stackTrace) {
-    blog.e('error creating game', stackTrace);
+    logE('error creating game', stackTrace);
   });
 
   return Tuple2(newGame.key, memberKey);
@@ -120,14 +122,14 @@ Future<void> chooseBread(String gameKey) async {
       await FirebaseDatabase.instance.ref().child('/games/$gameKey').get();
 
   if (!gameSnap.exists) {
-    blog.e('game with key $gameKey not found');
+    logE('game with key $gameKey not found');
     return Future.error({'code': ErrorCodes.gameNotFound});
   }
 
   final game = Game.fromJson(gameSnap.value as Map);
 
   if (game.status != GameStatus.choosingBread) {
-    blog.e('game $game has wrong status, cannot choose bread');
+    logE('game $game has wrong status, cannot choose bread');
     return Future.error({'code': ErrorCodes.gameHasWrongStatus});
   }
 
@@ -135,7 +137,7 @@ Future<void> chooseBread(String gameKey) async {
       await FirebaseDatabase.instance.ref().child('/members/$gameKey').get();
 
   if (!gameMembersSnap.exists) {
-    blog.e('members for game $gameSnap do not exist');
+    logE('members for game $gameSnap do not exist');
     return;
   }
 
@@ -147,7 +149,7 @@ Future<void> chooseBread(String gameKey) async {
   final randomIndex = Random().nextInt(allMembers.length);
   final breadMember = allMembers[randomIndex];
 
-  logI('random index is ', ['$randomIndex']);
+  logI('random index is {}', ['$randomIndex']);
 
   await FirebaseDatabase.instance
       .ref()
@@ -155,6 +157,56 @@ Future<void> chooseBread(String gameKey) async {
       .set(true);
 
   logI('member {} will be the bread', ['$breadMember']);
+}
+
+///
+/// Vote for word
+///
+Future<void> voteForWord(Word word, UserId userId) async {
+  logI('userId {} voting for word {}', [userId, '$word']);
+
+  await _getGame(word.gameKey).then((game) {
+    if (game.status != GameStatus.votingWords) {
+      logE('game {} has wrong status, cannot vote', ['$game']);
+      return Future.error({'code': ErrorCodes.gameHasWrongStatus});
+    }
+  });
+
+  final userMemberSnap = await FirebaseDatabase.instance
+      .ref('/members/${word.gameKey}')
+      .orderByChild('userId')
+      .equalTo(userId)
+      .get();
+
+  if (userMemberSnap.exists && Member.fromJson(userMemberSnap.value as Map).hasVotedForWord) {
+    logE('user {} already voted for word {}', [userId, '$word']);
+    return Future.error({'code': ErrorCodes.alreadyVotedWord});
+  }
+
+  final result = await FirebaseDatabase.instance
+      .ref('/words/${word.gameKey}/${word.key}')
+      .runTransaction((Object? dbWord) {
+    if (dbWord == null) {
+      logE('word {} not found', ['$word']);
+      return Transaction.abort();
+    }
+
+    final _word = Word.fromJson(dbWord as Map);
+
+    final _updated = Word(
+        userId: _word.userId,
+        value: _word.value,
+        key: _word.key,
+        gameKey: _word.gameKey,
+        votes: _word.votes + 1);
+
+    // Return the new data.
+    return Transaction.success(_updated);
+  });
+
+  if (!result.committed) {
+    return Future.error({'code': ErrorCodes.wordNotFound});
+  }
 }
 
 ///
@@ -181,4 +233,18 @@ Future<Member> _createMember(
       .then((prefs) => prefs.setString(PENDING_GAME_PREFS_KEY, gameKey));
 
   return newMember;
+}
+
+Future<Game> _getGame(String gameKey) async {
+  final gameSnap =
+      await FirebaseDatabase.instance.ref().child('/games/$gameKey').get();
+
+  if (!gameSnap.exists) {
+    logE('game with key {} not found', [gameKey]);
+    return Future.error({'code': ErrorCodes.gameNotFound});
+  }
+
+
+  final game = Game.fromJson(gameSnap.value as Map);
+  return game;
 }

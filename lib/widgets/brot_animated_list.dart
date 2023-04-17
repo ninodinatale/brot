@@ -3,11 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
-typedef BrotListBuilder<T> = Widget Function(BuildContext, T);
+typedef BrotListBuilder<T> = Widget Function(BuildContext, T, bool isSelected);
 
 class AnimatedListOf<T> extends StatefulWidget {
   final BrotListBuilder<T> itemBuilder;
-  final void Function()? onTap;
+  final void Function(T item, int index)? onTap;
 
   const AnimatedListOf({Key? key, required this.itemBuilder, this.onTap})
       : super(key: key);
@@ -32,6 +32,7 @@ class AnimatedListStateOf<T> extends State<AnimatedListOf<T>> {
 
   final _animatedListKey = GlobalKey<AnimatedListState>();
   final List<T> _items;
+  int _selectedIndex = -1;
 
   AnimatedListState? get _animatedList => _animatedListKey.currentState;
 
@@ -57,6 +58,7 @@ class AnimatedListStateOf<T> extends State<AnimatedListOf<T>> {
   void removeAt(int index) {
     Timer(_removeDebounceTime + Duration.zero, () async {
       final T removedItem = _items.removeAt(index);
+      _selectedIndex = index == _selectedIndex ? -1 : _selectedIndex;
       if (removedItem != null) {
         _animatedList!.removeItem(
           index,
@@ -65,7 +67,8 @@ class AnimatedListStateOf<T> extends State<AnimatedListOf<T>> {
                 item: removedItem,
                 animation: animation,
                 context: context,
-                itemBuilderChild: widget.itemBuilder);
+                itemBuilderChild: widget.itemBuilder,
+                isSelected: index == _selectedIndex);
           },
         );
       }
@@ -78,6 +81,22 @@ class AnimatedListStateOf<T> extends State<AnimatedListOf<T>> {
     });
     _removeDebounceTime = _removeDebounceTime +
         const Duration(milliseconds: _DEBOUNCE_TIME_INCREMENT_MS);
+  }
+
+  void selectItem(T item) {
+    selectIndex(_items.indexOf(item));
+  }
+
+  void selectIndex(int index) {
+    setState(() {
+      _selectedIndex = _selectedIndex == index ? -1 : index;
+    });
+  }
+
+  void deselect() {
+    setState(() {
+      _selectedIndex = -1;
+    });
   }
 
   int get length => _items.length;
@@ -93,6 +112,7 @@ class AnimatedListStateOf<T> extends State<AnimatedListOf<T>> {
       required BrotListBuilder<T> itemBuilderChild,
       required Animation<double> animation,
       required T item,
+      required bool isSelected,
       void Function()? onTap}) {
     return Padding(
       padding: const EdgeInsets.all(2.0),
@@ -104,7 +124,7 @@ class AnimatedListStateOf<T> extends State<AnimatedListOf<T>> {
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: onTap,
-          child: itemBuilderChild(context, item),
+          child: itemBuilderChild(context, item, isSelected),
         ),
       ),
     );
@@ -118,8 +138,9 @@ class AnimatedListStateOf<T> extends State<AnimatedListOf<T>> {
       itemBuilder: (context, index, animation) => _itemBuilderWrapper(
           itemBuilderChild: widget.itemBuilder,
           animation: animation,
-          onTap: widget.onTap,
+          onTap: () => widget.onTap?.call(_items[index], index),
           context: context,
+          isSelected: index == _selectedIndex,
           item: _items[index]),
     );
   }

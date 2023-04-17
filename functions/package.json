@@ -5,6 +5,7 @@
     "build": "tsc",
     "build:watch": "tsc --watch",
     "serve": "npm run build && firebase emulators:start --only database --import=./emulator_exports",
+    "export": "firebase emulators:export --only database ../exports/who-is-the-bread-default-rtdb.json",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",

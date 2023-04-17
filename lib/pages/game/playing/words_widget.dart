@@ -58,7 +58,7 @@ class _WordsWidgetState extends State<WordsWidget> {
     _subs.forEach((sub) => sub.cancel());
   }
 
-  Widget _itemBuilder(BuildContext context, Word word) {
+  Widget _itemBuilder(BuildContext context, Word word, bool isSelected) {
     final theme = Theme.of(context);
     return Card(
         child: ListTile(

@@ -7,11 +7,17 @@ part of 'word.dart';
 // **************************************************************************
 
 Word _$WordFromJson(Map json) => Word(
+      key: json['key'] as String,
       value: json['value'] as String,
+      gameKey: json['gameKey'] as String,
       userId: json['userId'] as String,
+      votes: json['votes'] as int? ?? 0,
     );
 
 Map<String, dynamic> _$WordToJson(Word instance) => <String, dynamic>{
+      'key': instance.key,
       'userId': instance.userId,
+      'gameKey': instance.gameKey,
       'value': instance.value,
+      'votes': instance.votes,
     };

@@ -11,7 +11,6 @@ class VotingWordsHeaderWidget extends StatelessWidget {
   const VotingWordsHeaderWidget({
     super.key,
   });
-
   @override
   Widget build(BuildContext context) {
     final gameKey = Provider.of<Game>(context).key;

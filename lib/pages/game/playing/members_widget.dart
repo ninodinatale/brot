@@ -58,7 +58,7 @@ class _MembersWidgetState extends State<MembersWidget> {
             _list.items.replaceRange(index, index + 1, [changedMember]);
           });
         } else {
-          blog.e(
+          logE(
               'member $changedMember does not exist in current member list - cannot update');
         }
       })
@@ -71,7 +71,7 @@ class _MembersWidgetState extends State<MembersWidget> {
     _subs.forEach((sub) => sub.cancel());
   }
 
-  Widget _itemBuilder(BuildContext context, Member member) {
+  Widget _itemBuilder(BuildContext context, Member member, bool isSelected) {
     final theme = Theme.of(context);
     final hasName = member.name != '';
     return Card(

@@ -7,6 +7,7 @@ import 'package:brot/models/state/user_member.dart';
 import 'package:brot/models/state/word.dart';
 import 'package:brot/pages/game/header_widget.dart';
 import 'package:brot/pages/game/voting_words/is_bread_voting_words_content_widget.dart';
+import 'package:brot/pages/game/voting_words/is_not_bread_voting_words_content_widget.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animator/widgets/animator_widget.dart';
@@ -66,7 +67,9 @@ class _GamePageWidgetState extends State<GamePageWidget> {
         .map((event) {
       logI('onChildAdded fired for path {} with value {}',
           ['/members/${widget.gameKey}', '${event.snapshot.value}']);
-      return Word.fromJson(event.snapshot.value as Map).userId ==
+      return Word
+          .fromJson(event.snapshot.value as Map)
+          .userId ==
           Provider.of<UserId>(context);
     }).asBroadcastStream();
     _changedGameStream = FirebaseDatabase.instance
@@ -89,8 +92,9 @@ class _GamePageWidgetState extends State<GamePageWidget> {
         return GameStatus.values[event.snapshot.value as int];
       } else {
         final msg =
-            'expected value to be of type int, but was ${event.snapshot.value.runtimeType}';
-        blog.e(msg);
+            'expected value to be of type int, but was ${event.snapshot.value
+            .runtimeType}';
+        logE(msg);
         throw TypeError();
       }
     }).asBroadcastStream();
@@ -108,8 +112,8 @@ class _GamePageWidgetState extends State<GamePageWidget> {
     }).asBroadcastStream();
   }
 
-  Widget _gameContentBuilder(
-      BuildContext context, GameStatus status, UserMember userMember) {
+  Widget _gameContentBuilder(BuildContext context, GameStatus status,
+      UserMember userMember) {
     switch (status) {
       case GameStatus.lobby:
       case GameStatus.choosingBread:
@@ -117,9 +121,9 @@ class _GamePageWidgetState extends State<GamePageWidget> {
       case GameStatus.votingWords:
         return userMember.isBread
             ? const IsBreadVotingWordsContentWidget()
-            : Text('IS NOT BREAD UNIMPL');
+            : IsNotBreadVotingWordsContentWidget(gameKey: widget.gameKey);
       case GameStatus.playing:
-        // TODO: Handle this case.
+      // TODO: Handle this case.
         return Text('UNIMPL');
     }
   }
@@ -129,7 +133,8 @@ class _GamePageWidgetState extends State<GamePageWidget> {
     final theme = Theme.of(context);
     return FutureBuilder(
         future: _valueGameStream.first.then(
-            (game) async => Tuple2(game, await _valueUserMemberStream.first)),
+                (game) async =>
+                Tuple2(game, await _valueUserMemberStream.first)),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return MultiProvider(
@@ -144,24 +149,27 @@ class _GamePageWidgetState extends State<GamePageWidget> {
                     initialData: snapshot.requireData.item1.status,
                     create: (context) => _changedGameStatusStream),
                 StreamProvider<UserHasWord>(
-                    initialData: false, create: (context) => _userHasWordStream),
+                    initialData: false,
+                    create: (context) => _userHasWordStream),
                 Provider<GlobalKey<AnimatorWidgetState>>(
                   create: (context) => GlobalKey<AnimatorWidgetState>(),
                 )
               ],
-              builder: (context, child) => Column(
-                children: [
-                  HeaderWidget(),
-                  Expanded(
-                    child: Padding(
-                        padding: const EdgeInsets.all(20), child: child),
-                  )
-                ],
-              ),
+              builder: (context, child) =>
+                  Column(
+                    children: [
+                      HeaderWidget(),
+                      Expanded(
+                        child: Padding(
+                            padding: const EdgeInsets.all(20), child: child),
+                      )
+                    ],
+                  ),
               child: Consumer<GameStatus>(
-                builder: (context, status, child) => Consumer<UserMember>(
-                    builder: (context, userMember, child) =>
-                        _gameContentBuilder(context, status, userMember)),
+                builder: (context, status, child) =>
+                    Consumer<UserMember>(
+                        builder: (context, userMember, child) =>
+                            _gameContentBuilder(context, status, userMember)),
               ),
             );
           } else {

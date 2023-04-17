@@ -34,7 +34,7 @@ void main() async {
 
       FirebaseDatabase.instance.useDatabaseEmulator(emulatorHost, 9000);
     } catch (e) {
-      blog.e(e);
+      logE('setting up database emulator failed - error: $e');
       return;
     }
   }
@@ -208,7 +208,7 @@ class _SplashScreenWidget extends State<SplashScreenWidget> {
           // ignore: use_build_context_synchronously
           if (!context.mounted) {
             const e = 'context not mounted, cannot navigate!';
-            blog.e(e);
+            logE(e);
             throw StateError(e);
           } else {
             FlutterNativeSplash.remove();
@@ -217,7 +217,7 @@ class _SplashScreenWidget extends State<SplashScreenWidget> {
             return;
           }
         } else {
-          blog.w(
+          logW(
               'could not find a member entry for game $pendingGameKey and user $userId\nremoving pending game from cache');
           await prefs.remove('pendingGameKey');
         }

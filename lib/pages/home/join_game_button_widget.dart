@@ -54,7 +54,7 @@ class JoinGameButtonWidgetState extends State<JoinGameButtonWidget> {
           _isGameStarted = true;
         });
       } else {
-        blog.e('joining game failed', error, stackTrace);
+        logE('joining game failed, error: $error');
       }
     }).whenComplete(() => setState(() => _isJoinGameLoading = false));
   }

@@ -12,11 +12,13 @@ class Member extends ChangeNotifier {
   final String name;
   final bool isAdmin;
   final bool isBread;
+  final bool hasVotedForWord;
 
   Member(
       {required this.key,
       required this.userId,
       this.isAdmin = false,
+      this.hasVotedForWord = false,
       required this.name,
       this.isBread = false});
 

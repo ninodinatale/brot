@@ -25,11 +25,15 @@ class _EnterWordWidgetState extends State<EnterWordWidget> {
     setState(() {
       _isLoading = true;
     });
-    final word = Word(value: _controller.value.text, userId: userId);
-    FirebaseDatabase.instance
-        .ref('/words/${game.key}')
-        .push()
-        .set(word.toJson());
+    final ref = FirebaseDatabase.instance.ref('/words/${game.key}').push();
+    final word = Word(
+        key: ref.key!,
+        gameKey: game.key,
+        value: _controller.value.text,
+        userId: userId);
+    ref.set(word.toJson()).then((value) {
+      logI('word {} created', ['$word']);
+    });
   }
 
   @override

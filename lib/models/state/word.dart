@@ -6,11 +6,13 @@ part 'word.g.dart';
 @JsonSerializable(explicitToJson: true, anyMap: true)
 @immutable
 class Word {
+  final String key;
   final String userId;
+  final String gameKey;
   final String value;
-  final int votes = 0;
+  final int votes;
 
-  const Word({required this.value, required this.userId});
+  const Word({required this.key, required this.value, required this.gameKey, required this.userId, this.votes = 0});
 
   factory Word.firstFromJson(Map<dynamic, dynamic> json) =>
       Word.fromJson(json.values.first);
