@@ -5,9 +5,8 @@ import 'package:brot/models/state/member.dart';
 import 'package:brot/models/state/user_id.dart';
 import 'package:brot/models/state/user_member.dart';
 import 'package:brot/models/state/word.dart';
+import 'package:brot/pages/game/content_widget.dart';
 import 'package:brot/pages/game/header_widget.dart';
-import 'package:brot/pages/game/voting_words/is_bread_voting_words_content_widget.dart';
-import 'package:brot/pages/game/voting_words/is_not_bread_voting_words_content_widget.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animator/widgets/animator_widget.dart';
@@ -15,7 +14,6 @@ import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
 import '../../logger.dart';
-import 'lobby/content_members_widget.dart';
 
 class GamePageWidget extends StatefulWidget {
   const GamePageWidget({Key? key, required this.gameKey, this.memberKey})
@@ -149,22 +147,6 @@ class _GamePageWidgetState extends State<GamePageWidget> {
     }).asBroadcastStream();
   }
 
-  Widget _gameContentBuilder(
-      BuildContext context, GameStatus status, UserMember userMember) {
-    switch (status) {
-      case GameStatus.lobby:
-      case GameStatus.choosingBread:
-        return ContentMembersWidget(widget.gameKey);
-      case GameStatus.votingWords:
-        return userMember.isBread
-            ? const IsBreadVotingWordsContentWidget()
-            : IsNotBreadVotingWordsContentWidget(gameKey: widget.gameKey);
-      case GameStatus.playing:
-        // TODO: Handle this case.
-        return Text('UNIMPL');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -203,11 +185,7 @@ class _GamePageWidgetState extends State<GamePageWidget> {
                   )
                 ],
               ),
-              child: Consumer<GameStatus>(
-                builder: (context, status, child) => Consumer<UserMember>(
-                    builder: (context, userMember, child) =>
-                        _gameContentBuilder(context, status, userMember)),
-              ),
+              child: Consumer<Game>(builder: (context, game, child) => ContentWidget(gameKey: game.key,)),
             );
           } else {
             return CircularProgressIndicator(
