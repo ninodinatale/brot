@@ -5,8 +5,10 @@ import 'package:brot/widgets/brot_animated_list.dart';
 import 'package:brot/widgets/dot3_progress_indicator.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../logger.dart';
+import '../../../models/state/user_id.dart';
 
 class ContentMembersWidget extends StatefulWidget {
   const ContentMembersWidget(this.gameKey, {Key? key}) : super(key: key);
@@ -71,10 +73,13 @@ class _ContentMembersWidgetState extends State<ContentMembersWidget> {
 
   Widget _itemBuilder(BuildContext context, Member member, bool isSelected) {
     final theme = Theme.of(context);
+    final userId = Provider.of<UserId>(context);
+
     final hasName = member.name != '';
+    final isUser = member.userId == userId;
     return Card(
       child: ListTile(
-          leading: Icon(Icons.person, color: hasName ? Colors.green : null),
+          leading: Icon(Icons.person, color: isUser ? Colors.green : null),
           title: !hasName
               ? Dot3ProgressIndicator(
                   prefix: 'tritt bei',
