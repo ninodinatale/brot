@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:brot/pages/game/voting_words/voting_words_wrapper_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +17,29 @@ class ContentWidget extends StatefulWidget {
 }
 
 class _ContentWidgetState extends State<ContentWidget> {
+  var _waitForAnimation = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _enableAnimationDelay();
+  }
+
+  void _enableAnimationDelay() {
+    _waitForAnimation = true;
+    Timer(const Duration(seconds: 2), () => setState(() {
+      _waitForAnimation = false;
+    }));
+
+  }
+
+
+  @override
+  void didUpdateWidget(ContentWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _enableAnimationDelay();
+  }
+
   Widget _gameContentBuilder(GameStatus status) {
     switch (status) {
       case GameStatus.lobby:
@@ -30,7 +55,10 @@ class _ContentWidgetState extends State<ContentWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final gameStatus = Provider.of<GameStatus>(context);
-    return _gameContentBuilder(gameStatus);
+    if (!_waitForAnimation) {
+      final gameStatus = Provider.of<GameStatus>(context);
+      return _gameContentBuilder(gameStatus);
+    }
+    return Container();
   }
 }
