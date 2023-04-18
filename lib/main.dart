@@ -70,6 +70,7 @@ class _MyAppState extends State<MyApp> {
         userId = const Uuid().v1();
       }
       logI('userId is {}', ['$userId']);
+      prefs.setString('userId', userId);
       return userId;
     });
   }
@@ -100,8 +101,8 @@ class _MyAppState extends State<MyApp> {
               TextStyle(fontWeight: FontWeight.bold, letterSpacing: -5),
           displayMedium:
               TextStyle(fontWeight: FontWeight.bold, letterSpacing: -5),
-          displaySmall:
-              TextStyle(fontWeight: FontWeight.bold, letterSpacing: -1, fontSize: 32),
+          displaySmall: TextStyle(
+              fontWeight: FontWeight.bold, letterSpacing: -1, fontSize: 32),
           //   titleLarge: TextStyle(
           //       fontSize: 48.0, fontWeight: FontWeight.bold, letterSpacing: -1),
           //   titleMedium: TextStyle(

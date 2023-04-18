@@ -1,24 +1,23 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../../models/state/game.dart';
 import '../../../models/state/user_id.dart';
 import 'enter_word_widget.dart';
 
 class NotBreadHeaderWidget extends StatelessWidget {
   const NotBreadHeaderWidget({
     super.key,
-    required this.gameKey,
-    required this.userId,
   });
-
-  final String gameKey;
-  final UserId userId;
 
   @override
   Widget build(BuildContext context) {
+    final game = Provider.of<Game>(context);
+    final userId = Provider.of<UserId>(context);
     return FutureBuilder(
         future: FirebaseDatabase.instance
-            .ref('/words/$gameKey')
+            .ref('/words/${game.key}')
             .orderByChild('userId')
             .equalTo(userId)
             .get(),

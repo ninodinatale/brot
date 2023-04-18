@@ -4,7 +4,7 @@
     "lint": "eslint --ext .js,.ts .",
     "build": "tsc",
     "build:watch": "tsc --watch",
-    "serve": "npm run build && firebase emulators:start --only database --import=./emulator_exports",
+    "serve": "npm run build && firebase emulators:start --only database --import=../database_export",
     "export": "firebase emulators:export --only database ../exports/who-is-the-bread-default-rtdb.json",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",

@@ -4,6 +4,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'member.g.dart';
 
 typedef MembersMap = Map<String, Member>;
+typedef UserIsBread = bool;
 
 @JsonSerializable(anyMap: true, explicitToJson: true)
 class Member extends ChangeNotifier {

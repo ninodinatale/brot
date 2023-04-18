@@ -39,9 +39,15 @@ class _GamePageWidgetState extends State<GamePageWidget> {
 
   late Stream<bool> _userHasWordStream;
 
+  late Stream<UserIsBread> _userIsBreadStream;
+
   @override
   void initState() {
     super.initState();
+
+    ///
+    /// Game init
+    ///
     _valueGameStream = FirebaseDatabase.instance
         .ref('/games/${widget.gameKey}')
         .onValue
@@ -51,27 +57,10 @@ class _GamePageWidgetState extends State<GamePageWidget> {
 
       return Game.fromJson(event.snapshot.value as Map);
     }).asBroadcastStream();
-    _valueUserMemberStream = FirebaseDatabase.instance
-        .ref('/members/${widget.gameKey}/${widget.memberKey}')
-        .onValue
-        .map((event) {
-      logI('onValue fired for path {} with value {}', [
-        '/members/${widget.gameKey}/${widget.memberKey}',
-        '${event.snapshot.value}'
-      ]);
-      return UserMember.fromJson(event.snapshot.value as Map);
-    }).asBroadcastStream();
-    _userHasWordStream = FirebaseDatabase.instance
-        .ref('/members/${widget.gameKey}')
-        .onChildAdded
-        .map((event) {
-      logI('onChildAdded fired for path {} with value {}',
-          ['/members/${widget.gameKey}', '${event.snapshot.value}']);
-      return Word
-          .fromJson(event.snapshot.value as Map)
-          .userId ==
-          Provider.of<UserId>(context);
-    }).asBroadcastStream();
+
+    ///
+    /// Game changes
+    ///
     _changedGameStream = FirebaseDatabase.instance
         .ref('/games/${widget.gameKey}')
         .onChildChanged
@@ -82,6 +71,10 @@ class _GamePageWidgetState extends State<GamePageWidget> {
     }).map((event) {
       return Game.firstFromJson(event.value as Map);
     }).asBroadcastStream();
+
+    ///
+    /// GameStatus changes
+    ///
     _changedGameStatusStream = FirebaseDatabase.instance
         .ref('/games/${widget.gameKey}/status')
         .onValue
@@ -92,12 +85,29 @@ class _GamePageWidgetState extends State<GamePageWidget> {
         return GameStatus.values[event.snapshot.value as int];
       } else {
         final msg =
-            'expected value to be of type int, but was ${event.snapshot.value
-            .runtimeType}';
+            'expected value to be of type int, but was ${event.snapshot.value.runtimeType}';
         logE(msg);
         throw TypeError();
       }
     }).asBroadcastStream();
+
+    ///
+    /// UserMember init
+    ///
+    _valueUserMemberStream = FirebaseDatabase.instance
+        .ref('/members/${widget.gameKey}/${widget.memberKey}')
+        .onValue
+        .map((event) {
+      logI('onValue fired for path {} with value {}', [
+        '/members/${widget.gameKey}/${widget.memberKey}',
+        '${event.snapshot.value}'
+      ]);
+      return UserMember.fromJson(event.snapshot.value as Map);
+    }).asBroadcastStream();
+
+    ///
+    /// UserMember changes
+    ///
     _changedUserMemberStream = FirebaseDatabase.instance
         .ref('/members/${widget.gameKey}/${widget.memberKey}')
         .onChildChanged
@@ -110,10 +120,37 @@ class _GamePageWidgetState extends State<GamePageWidget> {
     }).map((event) {
       return UserMember.firstFromJson(event.value as Map);
     }).asBroadcastStream();
+
+    ///
+    /// UserIsBread changes
+    ///
+    _userIsBreadStream = FirebaseDatabase.instance
+        .ref('/members/${widget.gameKey}/${widget.memberKey}')
+        .onValue
+        .map((event) {
+      logI('onValue fired for path {} with value {}', [
+        '/members/${widget.gameKey}/${widget.memberKey}',
+        '${event.snapshot.value}'
+      ]);
+      return UserMember.fromJson(event.snapshot.value as Map).isBread;
+    });
+
+    ///
+    /// UserHasWord changes
+    ///
+    _userHasWordStream = FirebaseDatabase.instance
+        .ref('/members/${widget.gameKey}')
+        .onChildAdded
+        .map((event) {
+      logI('onChildAdded fired for path {} with value {}',
+          ['/members/${widget.gameKey}', '${event.snapshot.value}']);
+      return Word.fromJson(event.snapshot.value as Map).userId ==
+          Provider.of<UserId>(context);
+    }).asBroadcastStream();
   }
 
-  Widget _gameContentBuilder(BuildContext context, GameStatus status,
-      UserMember userMember) {
+  Widget _gameContentBuilder(
+      BuildContext context, GameStatus status, UserMember userMember) {
     switch (status) {
       case GameStatus.lobby:
       case GameStatus.choosingBread:
@@ -123,7 +160,7 @@ class _GamePageWidgetState extends State<GamePageWidget> {
             ? const IsBreadVotingWordsContentWidget()
             : IsNotBreadVotingWordsContentWidget(gameKey: widget.gameKey);
       case GameStatus.playing:
-      // TODO: Handle this case.
+        // TODO: Handle this case.
         return Text('UNIMPL');
     }
   }
@@ -133,8 +170,7 @@ class _GamePageWidgetState extends State<GamePageWidget> {
     final theme = Theme.of(context);
     return FutureBuilder(
         future: _valueGameStream.first.then(
-                (game) async =>
-                Tuple2(game, await _valueUserMemberStream.first)),
+            (game) async => Tuple2(game, await _valueUserMemberStream.first)),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return MultiProvider(
@@ -142,7 +178,7 @@ class _GamePageWidgetState extends State<GamePageWidget> {
                 StreamProvider<Game>(
                     initialData: snapshot.requireData.item1,
                     create: (context) => _changedGameStream),
-                StreamProvider<Member>(
+                StreamProvider<UserMember>(
                     initialData: snapshot.requireData.item2,
                     create: (context) => _changedUserMemberStream),
                 StreamProvider<GameStatus>(
@@ -151,25 +187,26 @@ class _GamePageWidgetState extends State<GamePageWidget> {
                 StreamProvider<UserHasWord>(
                     initialData: false,
                     create: (context) => _userHasWordStream),
+                StreamProvider<UserIsBread>(
+                    initialData: snapshot.requireData.item2.isBread,
+                    create: (context) => _userIsBreadStream),
                 Provider<GlobalKey<AnimatorWidgetState>>(
                   create: (context) => GlobalKey<AnimatorWidgetState>(),
                 )
               ],
-              builder: (context, child) =>
-                  Column(
-                    children: [
-                      HeaderWidget(),
-                      Expanded(
-                        child: Padding(
-                            padding: const EdgeInsets.all(20), child: child),
-                      )
-                    ],
-                  ),
+              builder: (context, child) => Column(
+                children: [
+                  HeaderWidget(),
+                  Expanded(
+                    child: Padding(
+                        padding: const EdgeInsets.all(20), child: child),
+                  )
+                ],
+              ),
               child: Consumer<GameStatus>(
-                builder: (context, status, child) =>
-                    Consumer<UserMember>(
-                        builder: (context, userMember, child) =>
-                            _gameContentBuilder(context, status, userMember)),
+                builder: (context, status, child) => Consumer<UserMember>(
+                    builder: (context, userMember, child) =>
+                        _gameContentBuilder(context, status, userMember)),
               ),
             );
           } else {

@@ -1,6 +1,4 @@
-import 'package:brot/models/state/game.dart';
-import 'package:brot/models/state/user_id.dart';
-import 'package:brot/models/state/user_member.dart';
+import 'package:brot/models/state/member.dart';
 import 'package:brot/pages/game/playing/is_bread_header_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -13,9 +11,7 @@ class VotingWordsHeaderWidget extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
-    final gameKey = Provider.of<Game>(context).key;
-    final userId = Provider.of<UserId>(context);
-    final userMember = Provider.of<UserMember>(context);
-    return userMember.isBread ? const IsBreadHeaderWidget() : NotBreadHeaderWidget(gameKey: gameKey, userId: userId);
+    final isBread = Provider.of<UserIsBread>(context);
+    return isBread ? const IsBreadHeaderWidget() : NotBreadHeaderWidget();
   }
 }
