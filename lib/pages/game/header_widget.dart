@@ -3,6 +3,7 @@ import 'package:brot/pages/game/choosing_bread/choosing_bread_header_widget.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../widgets/slide_up_down_switcher.dart';
 import 'lobby/lobby_header_widget.dart';
 import 'playing/playing_header_widget.dart';
 
@@ -49,7 +50,6 @@ class _AnimatedHeaderState extends State<AnimatedHeader> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Material(
       color: Colors.transparent,
       elevation: 20.0,
@@ -61,35 +61,10 @@ class _AnimatedHeaderState extends State<AnimatedHeader> {
           topRight: Radius.circular(0.0),
         ),
       ),
-      child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 1000),
-          transitionBuilder: (Widget child, Animation<double> animation) {
-            final sizeAnimation = TweenSequence<double>([
-              TweenSequenceItem(tween: ConstantTween(0.0), weight: 1),
-              TweenSequenceItem(tween: Tween(begin: 0, end: 1), weight: 1),
-            ]).animate(animation);
-            return SizeTransition(
-              axisAlignment: 1,
-              sizeFactor: sizeAnimation,
-              child: child,
-            );
-          },
-          child: Container(
-              key: ValueKey<GameStatus>(widget.gameStatus),
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                color: theme.scaffoldBackgroundColor,
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(40),
-                  bottomRight: Radius.circular(40),
-                  topLeft: Radius.circular(0.0),
-                  topRight: Radius.circular(0.0),
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(10, 40, 10, 20),
-                child: _getHeaderWidget(widget.gameStatus),
-              ))),
+      child: SlideUpDownSwitcher(
+        triggerValue: widget.gameStatus,
+        child: _getHeaderWidget(widget.gameStatus),
+      ),
     );
   }
 }
