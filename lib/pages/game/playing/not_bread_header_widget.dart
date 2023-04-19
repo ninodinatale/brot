@@ -13,12 +13,14 @@ class NotBreadHeaderWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final userHasWord = Provider.of<UserHasWord>(context);
     return userHasWord.value
-        ? Text(
-            'Vote für ein Wort 👇',
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge!
-                .copyWith(color: Theme.of(context).colorScheme.primary),
+        ? Center(
+            child: Text(
+              'Vote für ein Wort 👇',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge!
+                  .copyWith(color: Theme.of(context).colorScheme.primary),
+            ),
           )
         : const EnterWordWidget();
   }
