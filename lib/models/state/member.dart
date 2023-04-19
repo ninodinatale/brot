@@ -4,7 +4,6 @@ import 'package:json_annotation/json_annotation.dart';
 part 'member.g.dart';
 
 typedef MembersMap = Map<String, Member>;
-typedef UserIsBread = bool;
 
 @JsonSerializable(anyMap: true, explicitToJson: true)
 class Member extends ChangeNotifier {
@@ -34,4 +33,13 @@ class Member extends ChangeNotifier {
   String toString() {
     return toJson().toString();
   }
+}
+@JsonSerializable(anyMap: true, explicitToJson: true)
+@immutable
+class UserIsBread {
+  final bool value;
+
+  const UserIsBread(this.value);
+
+  factory UserIsBread.fromJson(Map<dynamic, dynamic> json) => _$UserIsBreadFromJson(json);
 }

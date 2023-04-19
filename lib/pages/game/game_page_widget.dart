@@ -2,18 +2,17 @@ import 'dart:async';
 
 import 'package:brot/models/state/game.dart';
 import 'package:brot/models/state/member.dart';
-import 'package:brot/models/state/user_id.dart';
 import 'package:brot/models/state/user_member.dart';
 import 'package:brot/models/state/word.dart';
 import 'package:brot/pages/game/content_widget.dart';
 import 'package:brot/pages/game/header_widget.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animator/widgets/animator_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
 import '../../logger.dart';
+import '../../models/state/user_id.dart';
 
 class GamePageWidget extends StatefulWidget {
   const GamePageWidget({Key? key, required this.gameKey, this.memberKey})
@@ -35,7 +34,7 @@ class _GamePageWidgetState extends State<GamePageWidget> {
   late Stream<UserMember> _changedUserMemberStream;
   late Stream<UserMember> _valueUserMemberStream;
 
-  late Stream<bool> _userHasWordStream;
+  late Stream<UserHasWord> _userHasWordStream;
 
   late Stream<UserIsBread> _userIsBreadStream;
 
@@ -130,21 +129,26 @@ class _GamePageWidgetState extends State<GamePageWidget> {
         '/members/${widget.gameKey}/${widget.memberKey}',
         '${event.snapshot.value}'
       ]);
-      return UserMember.fromJson(event.snapshot.value as Map).isBread;
+      return UserIsBread(
+          UserMember.fromJson(event.snapshot.value as Map).isBread);
     });
 
     ///
     /// UserHasWord changes
     ///
+    // weil ich noch kein consumer hab ;'( lol
     _userHasWordStream = FirebaseDatabase.instance
-        .ref('/members/${widget.gameKey}')
-        .onChildAdded
+        .ref('/words/${widget.gameKey}')
+        .orderByChild('userId')
+        .equalTo(context.read<UserId>())
+        .limitToFirst(1)
+        .onValue
         .map((event) {
-      logI('onChildAdded fired for path {} with value {}',
-          ['/members/${widget.gameKey}', '${event.snapshot.value}']);
-      return Word.fromJson(event.snapshot.value as Map).userId ==
-          Provider.of<UserId>(context);
-    }).asBroadcastStream();
+      logI('onValue fired for path {} with value {}',
+          ['/words/${widget.gameKey}', '${event.snapshot.value}']);
+      return UserHasWord(Word.firstFromJson(event.snapshot.value as Map).userId ==
+          context.read<UserId>());
+    });
   }
 
   @override
@@ -165,27 +169,32 @@ class _GamePageWidgetState extends State<GamePageWidget> {
                     create: (context) => _changedUserMemberStream),
                 StreamProvider<GameStatus>(
                     initialData: snapshot.requireData.item1.status,
-                    create: (context) => _changedGameStatusStream),
+                    create: (context) {
+                      return _changedGameStatusStream;
+                    }),
                 StreamProvider<UserHasWord>(
-                    initialData: false,
-                    create: (context) => _userHasWordStream),
+                    initialData: const UserHasWord(false),
+                    create: (context) {
+                      return _userHasWordStream;
+                    }),
                 StreamProvider<UserIsBread>(
-                    initialData: snapshot.requireData.item2.isBread,
+                    initialData:
+                        UserIsBread(snapshot.requireData.item2.isBread),
                     create: (context) => _userIsBreadStream),
-                Provider<GlobalKey<AnimatorWidgetState>>(
-                  create: (context) => GlobalKey<AnimatorWidgetState>(),
-                )
               ],
               builder: (context, child) => Column(
                 children: [
-                  HeaderWidget(),
+                  const HeaderWidget(),
                   Expanded(
                     child: Padding(
                         padding: const EdgeInsets.all(20), child: child),
                   )
                 ],
               ),
-              child: Consumer<Game>(builder: (context, game, child) => ContentWidget(gameKey: game.key,)),
+              child: Consumer<Game>(
+                  builder: (context, game, child) => ContentWidget(
+                        gameKey: game.key,
+                      )),
             );
           } else {
             return CircularProgressIndicator(

@@ -23,3 +23,12 @@ Map<String, dynamic> _$MemberToJson(Member instance) => <String, dynamic>{
       'isBread': instance.isBread,
       'hasVotedForWord': instance.hasVotedForWord,
     };
+
+UserIsBread _$UserIsBreadFromJson(Map json) => UserIsBread(
+      json['value'] as bool,
+    );
+
+Map<String, dynamic> _$UserIsBreadToJson(UserIsBread instance) =>
+    <String, dynamic>{
+      'value': instance.value,
+    };

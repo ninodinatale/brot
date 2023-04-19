@@ -27,5 +27,12 @@ class Word {
   }
 }
 
-typedef AddedWord = Word;
-typedef UserHasWord = bool;
+@JsonSerializable()
+@immutable
+class UserHasWord {
+  final bool value;
+
+  const UserHasWord(this.value);
+
+  factory UserHasWord.fromJson(Map<String, dynamic> json) => _$UserHasWordFromJson(json);
+}

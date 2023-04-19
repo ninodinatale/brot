@@ -11,7 +11,7 @@ class VotingWordsHeaderWidget extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
-    final isBread = Provider.of<UserIsBread>(context);
+    final isBread = Provider.of<UserIsBread>(context).value;
     return isBread ? const IsBreadHeaderWidget() : NotBreadHeaderWidget();
   }
 }

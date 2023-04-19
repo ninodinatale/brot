@@ -43,7 +43,7 @@ class AnimatedListStateOf<T> extends State<AnimatedListOf<T>> {
   void insert(T item) {
     Timer(_insertDebounceTime + Duration.zero, () async {
       _items.add(item);
-      _animatedList!.insertItem(_items.length - 1);
+      _animatedList?.insertItem(_items.length - 1);
       if (_insertDebounceTime.inMilliseconds > _DEBOUNCE_TIME_INCREMENT_MS) {
         _insertDebounceTime = _insertDebounceTime -
             const Duration(milliseconds: _DEBOUNCE_TIME_INCREMENT_MS);

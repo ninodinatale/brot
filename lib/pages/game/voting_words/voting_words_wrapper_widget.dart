@@ -19,7 +19,7 @@ class VotingWordsWrapperWidget extends StatefulWidget {
 class _VotingWordsWrapperWidgetState extends State<VotingWordsWrapperWidget> {
   @override
   Widget build(BuildContext context) {
-    final userIsBread = Provider.of<UserIsBread>(context);
+    final userIsBread = Provider.of<UserIsBread>(context).value;
     return userIsBread
         ? const IsBreadVotingWordsContentWidget()
         : IsNotBreadVotingWordsContentWidget(gameKey: widget.gameKey);

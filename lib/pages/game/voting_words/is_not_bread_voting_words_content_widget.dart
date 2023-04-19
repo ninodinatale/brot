@@ -85,7 +85,7 @@ class _IsNotBreadVotingWordsContentWidgetState
                       child: Text('Für "${item.value}" voten'),
                       onPressed: () {
                         voteForWord(
-                            item, Provider.of<UserId>(context, listen: false));
+                            item, context.read<UserId>());
                         Navigator.pop(context);
                       },
                     ),
