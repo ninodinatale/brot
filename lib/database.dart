@@ -178,7 +178,7 @@ Future<void> voteForWord(Word word, UserId userId) async {
       .equalTo(userId)
       .get();
 
-  if (userMemberSnap.exists && Member.fromJson(userMemberSnap.value as Map).hasVotedForWord) {
+  if (userMemberSnap.exists && Member.firstFromJson(userMemberSnap.value as Map).hasVotedForWord) {
     logE('user {} already voted for word {}', [userId, '$word']);
     return Future.error({'code': ErrorCodes.alreadyVotedWord});
   }
@@ -201,7 +201,7 @@ Future<void> voteForWord(Word word, UserId userId) async {
         votes: _word.votes + 1);
 
     // Return the new data.
-    return Transaction.success(_updated);
+    return Transaction.success(_updated.toJson());
   });
 
   if (!result.committed) {
