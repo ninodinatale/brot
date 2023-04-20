@@ -117,9 +117,10 @@ class _GameCodeWidgetState extends State<GameCodeWidget> {
                                 )),
                       },
                   child: const Text('Verlassen')),
-              ElevatedButton(
-                  onPressed: () => _startGame(game),
-                  child: _startGameButtonChild)
+              if (userMember.isAdmin)
+                ElevatedButton(
+                    onPressed: () => _startGame(game),
+                    child: _startGameButtonChild)
             ],
           ),
         )
