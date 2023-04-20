@@ -136,7 +136,6 @@ class _GamePageWidgetState extends State<GamePageWidget> {
     ///
     /// UserHasWord changes
     ///
-    // weil ich noch kein consumer hab ;'( lol
     _userHasWordStream = FirebaseDatabase.instance
         .ref('/words/${widget.gameKey}')
         .orderByChild('userId')
