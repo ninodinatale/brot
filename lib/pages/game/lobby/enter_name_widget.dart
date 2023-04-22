@@ -1,10 +1,10 @@
 import 'package:brot/models/state/game.dart';
-import 'package:brot/models/state/user_member.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../logger.dart';
+import '../../../models/state/member.dart';
 
 class EnterNameWidget extends StatefulWidget {
   const EnterNameWidget({Key? key}) : super(key: key);
@@ -18,7 +18,7 @@ class _EnterNameWidgetState extends State<EnterNameWidget> {
   bool _isLoading = false;
   bool _isValid = false;
 
-  void _setUserName(Game game, UserMember userMember) {
+  void _setUserName(Game game, Member userMember) {
     logI('set name for member {} to {} for game {}',
         ['$userMember', '${_controller.value.text}', '$game']);
     setState(() {
@@ -45,7 +45,7 @@ class _EnterNameWidgetState extends State<EnterNameWidget> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final game = Provider.of<Game>(context);
-    final userMember = Provider.of<UserMember>(context);
+    final userMember = Provider.of<Member>(context);
 
     return Row(
       children: [

@@ -1,8 +1,8 @@
 import 'dart:async';
 
+import 'package:brot/database.dart';
 import 'package:brot/models/state/game.dart';
 import 'package:brot/models/state/member.dart';
-import 'package:brot/models/state/user_member.dart';
 import 'package:brot/models/state/word.dart';
 import 'package:brot/pages/game/content_widget.dart';
 import 'package:brot/pages/game/header_widget.dart';
@@ -26,53 +26,16 @@ class GamePageWidget extends StatefulWidget {
 }
 
 class _GamePageWidgetState extends State<GamePageWidget> {
-  /// Game
-  late Stream<Game> _valueGameStream;
-  late Stream<Game> _changedGameStream;
-  late Stream<GameStatus> _changedGameStatusStream;
 
-  late Stream<UserMember> _changedUserMemberStream;
-  late Stream<UserMember> _valueUserMemberStream;
+  Future<Tuple2<Game, Member>> _dependentFutures(UserId userId) async {
+    final game = await getGame(widget.gameKey);
+    final member = await getMember(widget.gameKey, widget.memberKey!);
 
-  late Stream<UserHasWord> _userHasWordStream;
+    return Tuple2(game, member);
+  }
 
-  late Stream<UserIsBread> _userIsBreadStream;
-
-  @override
-  void initState() {
-    super.initState();
-
-    ///
-    /// Game init
-    ///
-    _valueGameStream = FirebaseDatabase.instance
-        .ref('/games/${widget.gameKey}')
-        .onValue
-        .map((event) {
-      logI('onValue fired for path {} with value {}',
-          ['/games/${widget.gameKey}', '${event.snapshot.value}']);
-
-      return Game.fromJson(event.snapshot.value as Map);
-    }).asBroadcastStream();
-
-    ///
-    /// Game changes
-    ///
-    _changedGameStream = FirebaseDatabase.instance
-        .ref('/games/${widget.gameKey}')
-        .onChildChanged
-        .asyncMap((event) {
-      logI('onChildChanged fired for path {} with value {}',
-          ['/games/${widget.gameKey}', '${event.snapshot.value}']);
-      return event.snapshot.ref.parent!.get();
-    }).map((event) {
-      return Game.firstFromJson(event.value as Map);
-    }).asBroadcastStream();
-
-    ///
-    /// GameStatus changes
-    ///
-    _changedGameStatusStream = FirebaseDatabase.instance
+  Stream<GameStatus> _createGameStatusStream() {
+    return FirebaseDatabase.instance
         .ref('/games/${widget.gameKey}/status')
         .onValue
         .map((event) {
@@ -86,67 +49,32 @@ class _GamePageWidgetState extends State<GamePageWidget> {
         logE(msg);
         throw TypeError();
       }
-    }).asBroadcastStream();
-
-    ///
-    /// UserMember init
-    ///
-    _valueUserMemberStream = FirebaseDatabase.instance
-        .ref('/members/${widget.gameKey}/${widget.memberKey}')
-        .onValue
-        .map((event) {
-      logI('onValue fired for path {} with value {}', [
-        '/members/${widget.gameKey}/${widget.memberKey}',
-        '${event.snapshot.value}'
-      ]);
-      return UserMember.fromJson(event.snapshot.value as Map);
-    }).asBroadcastStream();
-
-    ///
-    /// UserMember changes
-    ///
-    _changedUserMemberStream = FirebaseDatabase.instance
-        .ref('/members/${widget.gameKey}/${widget.memberKey}')
-        .onChildChanged
-        .asyncMap((event) {
-      logI('onChildChanged fired for path {} with value {}', [
-        '/members/${widget.gameKey}/${widget.memberKey}',
-        '${event.snapshot.value}'
-      ]);
-      return event.snapshot.ref.parent!.get();
-    }).map((event) {
-      return UserMember.firstFromJson(event.value as Map);
-    }).asBroadcastStream();
-
-    ///
-    /// UserIsBread changes
-    ///
-    _userIsBreadStream = FirebaseDatabase.instance
-        .ref('/members/${widget.gameKey}/${widget.memberKey}')
-        .onValue
-        .map((event) {
-      logI('onValue fired for path {} with value {}', [
-        '/members/${widget.gameKey}/${widget.memberKey}',
-        '${event.snapshot.value}'
-      ]);
-      return UserIsBread(
-          UserMember.fromJson(event.snapshot.value as Map).isBread);
     });
+  }
 
-    ///
-    /// UserHasWord changes
-    ///
-    _userHasWordStream = FirebaseDatabase.instance
-        .ref('/words/${widget.gameKey}')
-        .orderByChild('userId')
-        .equalTo(context.read<UserId>())
-        .limitToFirst(1)
+  Stream<UserIsBread> _createUserIsBreadStream() {
+    return FirebaseDatabase.instance
+        .ref('/members/${widget.gameKey}/${widget.memberKey}')
         .onValue
         .map((event) {
-      logI('onValue fired for path {} with value {}',
-          ['/words/${widget.gameKey}', '${event.snapshot.value}']);
-      return UserHasWord(Word.firstFromJson(event.snapshot.value as Map).userId ==
-          context.read<UserId>());
+      logI('onValue fired for path {} with value {}', [
+        '/members/${widget.gameKey}/${widget.memberKey}',
+        '${event.snapshot.value}'
+      ]);
+      return UserIsBread(Member.fromJson(event.snapshot.value as Map).isBread);
+    });
+  }
+
+  Stream<UserHasWord> _createUserHasWordStream() {
+    return FirebaseDatabase.instance
+        .ref('/members/${widget.gameKey}/${widget.memberKey}/hasVotedForWord')
+        .onValue
+        .map((event) {
+      logI('onValue fired for path {} with value {}', [
+        '/members/${widget.gameKey}/${widget.memberKey}/hasVotedForWord',
+        '${event.snapshot.value}'
+      ]);
+      return UserHasWord(event.snapshot.value as bool);
     });
   }
 
@@ -154,32 +82,28 @@ class _GamePageWidgetState extends State<GamePageWidget> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return FutureBuilder(
-        future: _valueGameStream.first.then(
-            (game) async => Tuple2(game, await _valueUserMemberStream.first)),
+        future: _dependentFutures(context.read<UserId>()),
         builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            logE(snapshot.error.toString());
+            return Center(child: Text('There was a problem :( try again.'));
+          }
           if (snapshot.hasData) {
+            final game = snapshot.requireData.item1;
+            final member = snapshot.requireData.item2;
             return MultiProvider(
               providers: [
-                StreamProvider<Game>(
-                    initialData: snapshot.requireData.item1,
-                    create: (context) => _changedGameStream),
-                StreamProvider<UserMember>(
-                    initialData: snapshot.requireData.item2,
-                    create: (context) => _changedUserMemberStream),
+                ListenableProvider<Game>(create: (context) => game),
+                ListenableProvider<Member>(create: (context) => member),
                 StreamProvider<GameStatus>(
-                    initialData: snapshot.requireData.item1.status,
-                    create: (context) {
-                      return _changedGameStatusStream;
-                    }),
+                    initialData: game.status,
+                    create: (context) => _createGameStatusStream()),
                 StreamProvider<UserHasWord>(
-                    initialData: const UserHasWord(false),
-                    create: (context) {
-                      return _userHasWordStream;
-                    }),
+                    initialData: const UserHasWord(null),
+                    create: (context) => _createUserHasWordStream()),
                 StreamProvider<UserIsBread>(
-                    initialData:
-                        UserIsBread(snapshot.requireData.item2.isBread),
-                    create: (context) => _userIsBreadStream),
+                    initialData: UserIsBread(member.isBread),
+                    create: (context) => _createUserIsBreadStream()),
               ],
               builder: (context, child) => Column(
                 children: [

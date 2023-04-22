@@ -40,7 +40,7 @@ void _log(Level level, String message, List<String>? interpolations) {
   String escapePrefix = '';
   String escapeSuffix = '';
 
-  if (true) {
+  if (_printer.colors) {
     String r = '0';
     String g = '0';
     String b = '0';
@@ -85,5 +85,5 @@ void _log(Level level, String message, List<String>? interpolations) {
     );
   }
 
-  _blog.log(level, finalMessage);
+  _blog.log(level, finalMessage, null, StackTrace.current);
 }

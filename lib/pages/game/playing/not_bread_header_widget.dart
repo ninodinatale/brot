@@ -1,3 +1,4 @@
+import 'package:brot/models/state/member.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -25,12 +26,16 @@ class _NotBreadHeaderWidgetState extends State<NotBreadHeaderWidget> {
   void initState() {
     super.initState();
     _controller = TextEditingController();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final userHasWord = context.read<UserHasWord>();
-      if (!userHasWord.value) {
-        _enterWord();
-      }
-    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
+  void didUpdateWidget(NotBreadHeaderWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -121,6 +126,17 @@ class _NotBreadHeaderWidgetState extends State<NotBreadHeaderWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final userHasWord = Provider.of<UserHasWord>(context);
+    final userIsBread = Provider.of<UserIsBread>(context);
+
+    if (userHasWord.value == null) {
+      return Container();
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!userIsBread.value && !userHasWord.value!) {
+        _enterWord();
+      }
+    });
     return Center(
       child: Text(
         'Vote für ein Wort 👇',

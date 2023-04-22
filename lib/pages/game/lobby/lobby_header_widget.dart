@@ -2,7 +2,7 @@ import 'package:brot/pages/game/lobby/game_code_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../models/state/user_member.dart';
+import '../../../models/state/member.dart';
 import 'enter_name_widget.dart';
 
 class LobbyHeaderWidget extends StatelessWidget {
@@ -10,7 +10,7 @@ class LobbyHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserMember>(
+    return Consumer<Member>(
       builder: (context, userMember, child) => userMember.name == ''
           ? const EnterNameWidget()
           : const GameCodeWidget(),

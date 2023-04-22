@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:brot/database.dart';
 import 'package:brot/models/state/game.dart';
 import 'package:brot/models/state/member.dart';
-import 'package:brot/models/state/user_member.dart';
 import 'package:brot/router.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -76,7 +75,7 @@ class _GameCodeWidgetState extends State<GameCodeWidget> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final game = Provider.of<Game>(context);
-    final userMember = Provider.of<UserMember>(context);
+    final userMember = Provider.of<Member>(context);
 
     return Column(
       children: [

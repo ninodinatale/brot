@@ -147,7 +147,7 @@ Future<void> chooseBread(String gameKey) async {
   logI('selecting from {} members a bread randomly', ['${allMembers.length}']);
 
   final randomIndex = Random().nextInt(allMembers.length);
-  final breadMember = allMembers[randomIndex];
+  final breadMember = allMembers[2];
 
   logI('random index is {}', ['$randomIndex']);
 
@@ -165,7 +165,7 @@ Future<void> chooseBread(String gameKey) async {
 Future<void> voteForWord(Word word, UserId userId) async {
   logI('userId {} voting for word {}', [userId, '$word']);
 
-  await _getGame(word.gameKey).then((game) {
+  await getGame(word.gameKey).then((game) {
     if (game.status != GameStatus.votingWords) {
       logE('game {} has wrong status, cannot vote', ['$game']);
       return Future.error({'code': ErrorCodes.gameHasWrongStatus});
@@ -202,7 +202,9 @@ Future<void> voteForWord(Word word, UserId userId) async {
         gameKey: _word.gameKey,
         votes: _word.votes + 1);
 
-    userMemberSnap.child('hasVotedForWord').ref.set(true);
+    FirebaseDatabase.instance
+        .ref('/members/${word.gameKey}/${userMember.key}/hasVotedForWord')
+        .set(true);
     return Transaction.success(_updated.toJson());
   });
 
@@ -237,7 +239,7 @@ Future<Member> _createMember(
   return newMember;
 }
 
-Future<Game> _getGame(String gameKey) async {
+Future<Game> getGame(String gameKey) async {
   final gameSnap =
       await FirebaseDatabase.instance.ref().child('/games/$gameKey').get();
 
@@ -246,7 +248,21 @@ Future<Game> _getGame(String gameKey) async {
     return Future.error({'code': ErrorCodes.gameNotFound});
   }
 
-
   final game = Game.fromJson(gameSnap.value as Map);
   return game;
+}
+
+Future<Member> getMember(String gameKey, String memberKey) async {
+  final memberSnapshot = await FirebaseDatabase.instance
+      .ref('/members/${gameKey}/${memberKey}')
+      .get();
+
+  if (!memberSnapshot.exists) {
+    logE('member with key {} from game with key {} not found',
+        [memberKey, gameKey]);
+    return Future.error({'code': ErrorCodes.gameNotFound});
+  }
+
+  final member = Member.fromJson(memberSnapshot.value as Map);
+  return member;
 }

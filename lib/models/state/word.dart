@@ -30,7 +30,7 @@ class Word {
 @JsonSerializable()
 @immutable
 class UserHasWord {
-  final bool value;
+  final bool? value;
 
   const UserHasWord(this.value);
 
