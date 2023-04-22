@@ -30,3 +30,14 @@ Map<String, dynamic> _$UserHasWordToJson(UserHasWord instance) =>
     <String, dynamic>{
       'value': instance.value,
     };
+
+UserHasVotedForWord _$UserHasVotedForWordFromJson(Map<String, dynamic> json) =>
+    UserHasVotedForWord(
+      json['value'] as bool,
+    );
+
+Map<String, dynamic> _$UserHasVotedForWordToJson(
+        UserHasVotedForWord instance) =>
+    <String, dynamic>{
+      'value': instance.value,
+    };

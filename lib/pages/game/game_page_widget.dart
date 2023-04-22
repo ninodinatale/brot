@@ -26,7 +26,6 @@ class GamePageWidget extends StatefulWidget {
 }
 
 class _GamePageWidgetState extends State<GamePageWidget> {
-
   Future<Tuple2<Game, Member>> _dependentFutures(UserId userId) async {
     final game = await getGame(widget.gameKey);
     final member = await getMember(widget.gameKey, widget.memberKey!);
@@ -65,7 +64,22 @@ class _GamePageWidgetState extends State<GamePageWidget> {
     });
   }
 
-  Stream<UserHasWord> _createUserHasWordStream() {
+  Stream<UserHasWord> _createUserHasWordStream(UserId userId) {
+    return FirebaseDatabase.instance
+        .ref('/words/${widget.gameKey}')
+        .orderByChild(userId)
+        .limitToFirst(1)
+        .onValue
+        .map((event) {
+      logI('onValue fired for path {} with value {}', [
+        '/words/${widget.gameKey}',
+        '${event.snapshot.value}'
+      ]);
+      return UserHasWord(event.snapshot.exists);
+    });
+  }
+
+  Stream<UserHasVotedForWord> _createUserHasVotedForWordStream() {
     return FirebaseDatabase.instance
         .ref('/members/${widget.gameKey}/${widget.memberKey}/hasVotedForWord')
         .onValue
@@ -74,15 +88,16 @@ class _GamePageWidgetState extends State<GamePageWidget> {
         '/members/${widget.gameKey}/${widget.memberKey}/hasVotedForWord',
         '${event.snapshot.value}'
       ]);
-      return UserHasWord(event.snapshot.value as bool);
+      return UserHasVotedForWord(event.snapshot.value as bool);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final userId = context.read<UserId>();
     return FutureBuilder(
-        future: _dependentFutures(context.read<UserId>()),
+        future: _dependentFutures(userId),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             logE(snapshot.error.toString());
@@ -100,7 +115,10 @@ class _GamePageWidgetState extends State<GamePageWidget> {
                     create: (context) => _createGameStatusStream()),
                 StreamProvider<UserHasWord>(
                     initialData: const UserHasWord(null),
-                    create: (context) => _createUserHasWordStream()),
+                    create: (context) => _createUserHasWordStream(userId)),
+                StreamProvider<UserHasVotedForWord>(
+                    initialData: const UserHasVotedForWord(false),
+                    create: (context) => _createUserHasVotedForWordStream()),
                 StreamProvider<UserIsBread>(
                     initialData: UserIsBread(member.isBread),
                     create: (context) => _createUserIsBreadStream()),

@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../logger.dart';
-import '../../../models/state/member.dart';
 import '../../../models/state/user_id.dart';
 import '../../../widgets/animated_flash.dart';
 import '../../../widgets/animated_int_widget.dart';
@@ -84,8 +83,7 @@ class _IsNotBreadVotingWordsContentWidgetState
                     ElevatedButton(
                       child: Text('Für "${item.value}" voten'),
                       onPressed: () {
-                        voteForWord(
-                            item, context.read<UserId>());
+                        voteForWord(item, context.read<UserId>());
                         Navigator.pop(context);
                       },
                     ),
@@ -137,10 +135,10 @@ class _IsNotBreadVotingWordsContentWidgetState
 
   @override
   Widget build(BuildContext context) {
-    final userMember = Provider.of<Member>(context);
+    final userHasVotedForWord = Provider.of<UserHasVotedForWord>(context);
     return AnimatedListOf<Word>(
       onTap: (item, index) =>
-          userMember.hasVotedForWord ? null : _voteForWord(item, index),
+          userHasVotedForWord.value ? null : _voteForWord(item, index),
       key: _list,
       itemBuilder: _itemBuilder,
     );

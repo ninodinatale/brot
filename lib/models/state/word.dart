@@ -36,3 +36,13 @@ class UserHasWord {
 
   factory UserHasWord.fromJson(Map<String, dynamic> json) => _$UserHasWordFromJson(json);
 }
+
+@JsonSerializable()
+@immutable
+class UserHasVotedForWord {
+  final bool value;
+
+  const UserHasVotedForWord(this.value);
+
+  factory UserHasVotedForWord.fromJson(Map<String, dynamic> json) => _$UserHasVotedForWordFromJson(json);
+}
