@@ -27,7 +27,7 @@ class HomePageWidgetState extends State<HomePageWidget> {
               children: [
                 Text('brot.',
                     style: theme.textTheme.displayLarge!
-                        .copyWith(color: theme.colorScheme.onPrimary)),
+                        .copyWith(color: theme.colorScheme.onSecondary)),
                 SvgPicture.asset(
                   'assets/images/bread.svg',
                   fit: BoxFit.scaleDown,

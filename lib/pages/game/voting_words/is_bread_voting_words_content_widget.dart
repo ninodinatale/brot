@@ -11,7 +11,7 @@ class IsBreadVotingWordsContentWidget extends StatelessWidget {
         child: Dot3ProgressIndicator(
       prefix: 'Die Brotlosen wählen ein Wort, bitte warten',
       textStyle: theme.textTheme.displaySmall!
-          .copyWith(color: theme.colorScheme.onPrimary.withOpacity(0.85)),
+          .copyWith(color: theme.colorScheme.onSecondary),
     ));
   }
 }

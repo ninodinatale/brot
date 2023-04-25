@@ -27,7 +27,7 @@ class SlideUpDownSwitcher<T> extends StatelessWidget {
             key: ValueKey<T>(triggerValue),
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
+              color: Theme.of(context).colorScheme.primaryContainer,
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(40),
                 bottomRight: Radius.circular(40),

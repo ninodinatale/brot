@@ -51,8 +51,6 @@ class CreateGameButtonWidgetState extends State<CreateGameButtonWidget> {
                 )
               : Text(
                   'spiel erstellen',
-                  style: theme.textTheme.titleSmall!
-                      .copyWith(color: theme.colorScheme.onPrimary),
                 )),
     );
   }

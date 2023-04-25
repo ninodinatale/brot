@@ -2,13 +2,14 @@
 class Assets {
   Assets._();
 
+  static const String assetsImagesBackgroundOverlay = 'assets/images/background_overlay.svg';
   static const String fontsFavicon = 'assets/fonts/favicon.png';
   static const String fontsPoppinsMedium = 'assets/fonts/Poppins-Medium.ttf';
   static const String fontsPoppinsRegular = 'assets/fonts/Poppins-Regular.ttf';
-  static const String fontsPoppinsSemiBold =
-      'assets/fonts/Poppins-SemiBold.ttf';
+  static const String fontsPoppinsSemiBold = 'assets/fonts/Poppins-SemiBold.ttf';
+  static const String imagesBackgroundOverlay = 'assets/images/background_overlay.png';
   static const String imagesBread = 'assets/images/bread.svg';
   static const String imagesFavicon = 'assets/images/favicon.png';
-  static const String imagesPageBackground2x =
-      'assets/images/page_background@2x.png';
+  static const String imagesPageBackground2x = 'assets/images/page_background@2x.png';
+
 }

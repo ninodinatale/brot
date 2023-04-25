@@ -28,9 +28,9 @@ void main() async {
     try {
       // Workaround for https://github.com/firebase/flutterfire/issues/8070
       final emulatorHost =
-          (!kIsWeb && defaultTargetPlatform == TargetPlatform.android)
-              ? '10.0.2.2'
-              : 'localhost';
+      (!kIsWeb && defaultTargetPlatform == TargetPlatform.android)
+          ? '10.0.2.2'
+          : 'localhost';
 
       FirebaseDatabase.instance.useDatabaseEmulator(emulatorHost, 9000);
     } catch (e) {
@@ -49,6 +49,26 @@ class MyApp extends StatefulWidget {
 
   static _MyAppState of(BuildContext context) =>
       context.findAncestorStateOfType<_MyAppState>()!;
+}
+
+final _colorScheme = ColorScheme.fromSeed(seedColor: Colors.indigo);
+
+extension HeaderStyles on TextTheme {
+  TextStyle get header1 {
+    return TextStyle(
+        color: _colorScheme.onPrimaryContainer,
+        fontWeight: FontWeight.w500, fontSize: 24);
+  }
+  TextStyle get header2 {
+    return TextStyle(
+        color: _colorScheme.onPrimaryContainer,
+        fontWeight: FontWeight.w500, fontSize: 18);
+  }
+  TextStyle get headerTimer {
+    return TextStyle(
+        color: _colorScheme.secondary,
+        fontWeight: FontWeight.w500, fontSize: 14);
+  }
 }
 
 class _MyAppState extends State<MyApp> {
@@ -80,40 +100,29 @@ class _MyAppState extends State<MyApp> {
     var buttonStyle = ButtonStyle(
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(18.0),
-    )));
+              borderRadius: BorderRadius.circular(18.0),
+            )));
+
 
     return MaterialApp.router(
       title: 'who-is-the-bread',
       theme: ThemeData(
-        scaffoldBackgroundColor: Color.fromRGBO(241, 241, 241, 1.0),
-
-        colorScheme: ColorScheme.fromSwatch(
-            primarySwatch: Colors.blue, accentColor: Colors.purple),
-
-        // Define the default font family.
-        fontFamily: 'Poppins',
+        colorScheme: _colorScheme,
+        cardTheme: CardTheme(
+          color: _colorScheme.primaryContainer,
+        ),
+        listTileTheme: ListTileThemeData(
+          textColor: _colorScheme.onPrimaryContainer,
+          selectedTileColor: _colorScheme.secondary.withOpacity(0.8),
+          selectedColor: _colorScheme.onSecondary.withOpacity(0.8),
+        ),
 
         // Define the default `TextTheme`. Use this to specify the default
         // text styling for headlines, titles, bodies of text, and more.
         textTheme: const TextTheme(
-          displayLarge:
-              TextStyle(fontWeight: FontWeight.bold, letterSpacing: -5),
-          displayMedium:
-              TextStyle(fontWeight: FontWeight.bold, letterSpacing: -5),
-          displaySmall: TextStyle(
-              fontWeight: FontWeight.bold, letterSpacing: -1, fontSize: 32),
-          //   titleLarge: TextStyle(
-          //       fontSize: 48.0, fontWeight: FontWeight.bold, letterSpacing: -1),
-          //   titleMedium: TextStyle(
-          //       fontSize: 36.0, fontWeight: FontWeight.bold, letterSpacing: -1),
-          //   titleSmall: TextStyle(
-          //       fontSize: 24.0, fontWeight: FontWeight.bold, letterSpacing: -1),
-          //   bodyMedium: TextStyle(
-          //       fontSize: 18.0,
-          //       color: onScaffoldBackgroundColor),
-          //   bodyLarge:
-          //       TextStyle(fontSize: 24.0, color: onScaffoldBackgroundColor),
+          titleLarge: TextStyle(fontWeight: FontWeight.w500),
+          titleMedium: TextStyle(fontWeight: FontWeight.w500),
+          titleSmall: TextStyle(fontWeight: FontWeight.w500),
         ),
 
         elevatedButtonTheme: ElevatedButtonThemeData(style: buttonStyle),
@@ -121,58 +130,63 @@ class _MyAppState extends State<MyApp> {
 
         inputDecorationTheme: InputDecorationTheme(
             border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(30))),
+            OutlineInputBorder(borderRadius: BorderRadius.circular(30))),
 
         // Needed - without buttons in web do not have margins.
         materialTapTargetSize: MaterialTapTargetSize.padded,
       ),
       routerConfig: router,
-      builder: (context, child) => FutureBuilder(
-        future: _userId,
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-            case ConnectionState.waiting:
-              return const CircularProgressIndicator();
-            case ConnectionState.active:
-            case ConnectionState.done:
-              if (snapshot.hasError || snapshot.data == null) {
-                return Text('Error: ${snapshot.error}');
-              } else {
-                return Provider<UserId>(
-                  create: (context) => snapshot.requireData,
-                  child: Scaffold(
-                    key: scaffoldKey,
-                    body: Container(
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          fit: BoxFit.cover,
-                          image: Image.asset(
-                            'assets/images/page_background@2x.png',
-                          ).image,
+      builder: (context, child) =>
+          FutureBuilder(
+            future: _userId,
+            builder: (context, snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.none:
+                case ConnectionState.waiting:
+                  return const CircularProgressIndicator();
+                case ConnectionState.active:
+                case ConnectionState.done:
+                  if (snapshot.hasError || snapshot.data == null) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    return Provider<UserId>(
+                      create: (context) => snapshot.requireData,
+                      child: Scaffold(
+                        key: scaffoldKey,
+                        body: Container(
+                          decoration: BoxDecoration(
+                            color: _colorScheme.tertiary,
+                            image: DecorationImage(
+                              fit: BoxFit.cover,
+                              image: Image
+                                  .asset(
+                                'assets/images/background_overlay.png',
+                              )
+                                  .image,
+                            ),
+                          ),
+                          child: LayoutBuilder(
+                            builder:
+                                (BuildContext context,
+                                BoxConstraints constraints) {
+                              if (constraints.maxWidth > 600) {
+                                return Center(
+                                    child: SizedBox(
+                                      width: 600,
+                                      child: child,
+                                    ));
+                              } else {
+                                return Center(child: child);
+                              }
+                            },
+                          ),
                         ),
                       ),
-                      child: LayoutBuilder(
-                        builder:
-                            (BuildContext context, BoxConstraints constraints) {
-                          if (constraints.maxWidth > 600) {
-                            return Center(
-                                child: SizedBox(
-                              width: 600,
-                              child: child,
-                            ));
-                          } else {
-                            return Center(child: child);
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                );
+                    );
+                  }
               }
-          }
-        },
-      ),
+            },
+          ),
     );
   }
 }

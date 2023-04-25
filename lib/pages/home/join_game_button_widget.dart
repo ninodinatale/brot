@@ -127,8 +127,6 @@ class JoinGameButtonWidgetState extends State<JoinGameButtonWidget> {
             padding: EdgeInsets.all(20)),
         child: Text(
           'spiel beitreten',
-          style: theme.textTheme.titleSmall!
-              .copyWith(color: theme.colorScheme.onSecondary),
         ));
   }
 }

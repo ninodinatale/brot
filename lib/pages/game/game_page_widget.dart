@@ -71,10 +71,8 @@ class _GamePageWidgetState extends State<GamePageWidget> {
         .limitToFirst(1)
         .onValue
         .map((event) {
-      logI('onValue fired for path {} with value {}', [
-        '/words/${widget.gameKey}',
-        '${event.snapshot.value}'
-      ]);
+      logI('onValue fired for path {} with value {}',
+          ['/words/${widget.gameKey}', '${event.snapshot.value}']);
       return UserHasWord(event.snapshot.exists);
     });
   }
@@ -89,6 +87,19 @@ class _GamePageWidgetState extends State<GamePageWidget> {
         '${event.snapshot.value}'
       ]);
       return UserHasVotedForWord(event.snapshot.value as bool);
+    });
+  }
+
+  Stream<Member> _createMemberStream() {
+    return FirebaseDatabase.instance
+        .ref('/members/${widget.gameKey}/${widget.memberKey}')
+        .onChildChanged
+        .map((event) {
+      logI('onChildChanged fired for path {} with value {}', [
+        '/members/${widget.gameKey}/${widget.memberKey}',
+        '${event.snapshot.value}'
+      ]);
+      return Member.fromJson(event.snapshot.value as Map);
     });
   }
 
@@ -109,7 +120,9 @@ class _GamePageWidgetState extends State<GamePageWidget> {
             return MultiProvider(
               providers: [
                 ListenableProvider<Game>(create: (context) => game),
-                ListenableProvider<Member>(create: (context) => member),
+                StreamProvider<Member>(
+                    initialData: member,
+                    create: (context) => _createMemberStream()),
                 StreamProvider<GameStatus>(
                     initialData: game.status,
                     create: (context) => _createGameStatusStream()),

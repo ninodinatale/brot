@@ -10,6 +10,7 @@ import '../../../logger.dart';
 import '../../../models/state/user_id.dart';
 import '../../../widgets/animated_flash.dart';
 import '../../../widgets/animated_int_widget.dart';
+import '../../../widgets/bottom_sheet_modal.dart';
 import '../../../widgets/brot_animated_list.dart';
 
 class IsNotBreadVotingWordsContentWidget extends StatefulWidget {
@@ -66,40 +67,32 @@ class _IsNotBreadVotingWordsContentWidgetState
 
   void _voteForWord(Word item, int index) {
     _list.currentState?.selectIndex(index);
-    showModalBottomSheet<void>(
-        isDismissible: false,
-        context: context,
-        builder: (BuildContext context) {
-          return StatefulBuilder(
-            builder: (context, setState) => Container(
-              height: 200,
-              color: Theme.of(context).colorScheme.background,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    const Text('Modal BottomSheet'),
-                    ElevatedButton(
-                      child: Text('Für "${item.value}" voten'),
-                      onPressed: () {
-                        voteForWord(item, context.read<UserId>());
-                        Navigator.pop(context);
-                      },
-                    ),
-                    TextButton(
-                      child: Text('Abbrechen'),
-                      onPressed: () {
-                        _list.currentState?.deselect();
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ),
-              ),
+    brotModalBottomSheet<void>(
+      context: context,
+      child: StatefulBuilder(
+        builder: (context, setState) => Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            const Text('Modal BottomSheet'),
+            ElevatedButton(
+              child: Text('Für "${item.value}" voten'),
+              onPressed: () {
+                voteForWord(item, context.read<UserId>());
+                Navigator.pop(context);
+              },
             ),
-          );
-        });
+            TextButton(
+              child: Text('Abbrechen'),
+              onPressed: () {
+                _list.currentState?.deselect();
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -109,26 +102,17 @@ class _IsNotBreadVotingWordsContentWidgetState
   }
 
   Widget _itemBuilder(BuildContext context, Word word, bool isSelected) {
-    final theme = Theme.of(context);
-    return Card(
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        decoration: BoxDecoration(
-            color: isSelected
-                ? theme.colorScheme.primary.withOpacity(0.5)
-                : Colors.transparent,
-            borderRadius: const BorderRadius.all(Radius.circular(3))),
-        child: AnimatedFlash(
-            value: word.votes,
-            child: ListTile(
-              leading: const Icon(Icons.abc),
-              title: Text(
-                word.value,
-                style: theme.textTheme.titleLarge!,
-              ),
-              trailing: AnimatedInt(
-                  value: word.votes, textStyle: theme.textTheme.titleLarge),
-            )),
+    return ShakeOnChange(
+      triggerValue: word.votes,
+      child: Card(
+        child: ListTile(
+          selected: isSelected,
+          leading: const Icon(Icons.abc),
+          title: Text(
+            word.value,
+          ),
+          trailing: AnimatedInt(value: word.votes),
+        ),
       ),
     );
   }

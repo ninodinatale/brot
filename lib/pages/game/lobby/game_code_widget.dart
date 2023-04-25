@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:brot/database.dart';
+import 'package:brot/main.dart';
 import 'package:brot/models/state/game.dart';
 import 'package:brot/models/state/member.dart';
 import 'package:brot/router.dart';
@@ -85,9 +86,7 @@ class _GameCodeWidgetState extends State<GameCodeWidget> {
                   offset: Duration(seconds: 2),
                   magnitude: 10,
                   autoPlay: AnimationPlayStates.Loop),
-              child: Text(game.gameCode,
-                  style: theme.textTheme.displaySmall
-                      ?.copyWith(color: theme.colorScheme.primary))),
+              child: Text(game.gameCode, style: theme.textTheme.header1)),
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
@@ -110,7 +109,7 @@ class _GameCodeWidgetState extends State<GameCodeWidget> {
                                           _leaveGame(game, userMember),
                                       child: Text('Verlassen',
                                           style: TextStyle(
-                                              color: theme.colorScheme.error)),
+                                              color: theme.colorScheme.secondary)),
                                     ),
                                   ],
                                 )),

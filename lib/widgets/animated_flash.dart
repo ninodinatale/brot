@@ -1,62 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animator/flutter_animator.dart';
 
-class AnimatedFlash extends StatefulWidget {
-  final int value;
+class ShakeOnChange extends StatefulWidget {
+  final Object triggerValue;
   final Widget child;
   final TextStyle? textStyle;
 
-  const AnimatedFlash(
-      {Key? key, required this.value, this.textStyle, required this.child})
+  const ShakeOnChange(
+      {Key? key,
+      required this.triggerValue,
+      this.textStyle,
+      required this.child})
       : super(key: key);
 
   @override
-  _AnimatedFlashState createState() => _AnimatedFlashState();
+  _ShakeOnChangeState createState() => _ShakeOnChangeState();
 }
 
-class _AnimatedFlashState extends State<AnimatedFlash>
+class _ShakeOnChangeState extends State<ShakeOnChange>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _animationController;
-  late final Animation<double> _animation;
-  Color? _backgroundColor;
-  final _pulseKey = GlobalKey<AnimatorWidgetState>();
-  final _duration = const Duration(milliseconds: 250);
+  final _shakeKey = GlobalKey<AnimatorWidgetState>();
 
   @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: _duration,
-    );
-    _animation = Tween<double>(
-      begin: 0.0,
-      end: 0.8,
-    ).animate(_animationController);
-    _animation.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _animationController.reverse();
-      }
-    });
-  }
-
-  @override
-  void didUpdateWidget(AnimatedFlash oldWidget) {
-    if (oldWidget.value != widget.value) {
-      _pulseKey.currentState?.forward();
-      _animationController.forward();
-      _animationController.addListener(() {
-        setState(() {
-          _backgroundColor = Colors.green.withOpacity(_animation.value);
-          // print(_animation.value);
-        });
-      });
+  void didUpdateWidget(ShakeOnChange oldWidget) {
+    if (oldWidget.triggerValue != widget.triggerValue) {
+      _shakeKey.currentState?.forward();
     }
     super.didUpdateWidget(oldWidget);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(color: _backgroundColor, child: widget.child);
+    return Shake(
+      key: _shakeKey,
+      preferences: const AnimationPreferences(
+          autoPlay: AnimationPlayStates.None,
+          magnitude: 0.5,
+          duration: Duration(milliseconds: 500)),
+      child: widget.child,
+    );
   }
 }

@@ -59,13 +59,12 @@ class _WordsWidgetState extends State<WordsWidget> {
   }
 
   Widget _itemBuilder(BuildContext context, Word word, bool isSelected) {
-    final theme = Theme.of(context);
     return Card(
         child: ListTile(
+            selected: isSelected,
             title: Text(
-      word.value,
-      style: theme.textTheme.titleMedium,
-    )));
+              word.value,
+            )));
   }
 
   @override

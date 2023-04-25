@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:brot/models/state/member.dart';
 import 'package:brot/widgets/brot_animated_list.dart';
-import 'package:brot/widgets/dot3_progress_indicator.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -30,12 +29,15 @@ class _ContentMembersWidgetState extends State<ContentMembersWidget> {
       FirebaseDatabase.instance
           .ref('/members/${widget.gameKey}')
           .onChildAdded
-          .listen((event) {
-        logI('onChildAdded fired for path {} with value {}',
-            ['/members/${widget.gameKey}', '${event.snapshot.value}']);
-        _list.currentState
-            ?.insert(Member.fromJson(event.snapshot.value as Map));
-      }),
+          .map((event) {
+            logI('onChildAdded fired for path {} with value {}',
+                ['/members/${widget.gameKey}', '${event.snapshot.value}']);
+            return Member.fromJson(event.snapshot.value as Map);
+          })
+          .where((member) => member.name.isNotEmpty)
+          .listen((member) {
+            _list.currentState?.insert(member);
+          }),
       FirebaseDatabase.instance
           .ref('/members/${widget.gameKey}')
           .onChildRemoved
@@ -46,22 +48,29 @@ class _ContentMembersWidgetState extends State<ContentMembersWidget> {
       FirebaseDatabase.instance
           .ref('/members/${widget.gameKey}')
           .onChildChanged
-          .listen((event) {
-        logI('onChildChanged fired for path {} with value {}',
-            ['/members/${widget.gameKey}', '${event.snapshot.value}']);
-        final changedMember = Member.fromJson(event.snapshot.value as Map);
-        final index = _list.currentState?.items.indexWhere(
-            (existingMember) => existingMember.key == changedMember.key);
-        if (index != null && index >= 0) {
-          setState(() {
-            _list.currentState?.items
-                .replaceRange(index, index + 1, [changedMember]);
-          });
-        } else {
-          logE(
-              'member $changedMember does not exist in current member list - cannot update');
-        }
-      })
+          .map((event) {
+            logI('onChildChanged fired for path {} with value {}',
+                ['/members/${widget.gameKey}', '${event.snapshot.value}']);
+            return Member.fromJson(event.snapshot.value as Map);
+          })
+          .where((member) => member.name.isNotEmpty)
+          .listen((changedMember) {
+            final index = _list.currentState?.items.indexWhere(
+                (existingMember) => existingMember.key == changedMember.key);
+            if (index != null && index >= 0) {
+              logI('member {} already in list, replacing them...',
+                  ['$changedMember']);
+              setState(() {
+                _list.currentState?.items
+                    .replaceRange(index, index + 1, [changedMember]);
+              });
+            } else {
+              logI(
+                  'member {} does not exist in current member list, inserting them...',
+                  ['$changedMember']);
+              _list.currentState?.insert(changedMember);
+            }
+          })
     ];
   }
 
@@ -72,24 +81,15 @@ class _ContentMembersWidgetState extends State<ContentMembersWidget> {
   }
 
   Widget _itemBuilder(BuildContext context, Member member, bool isSelected) {
-    final theme = Theme.of(context);
     final userId = Provider.of<UserId>(context);
 
-    final hasName = member.name != '';
     final isUser = member.userId == userId;
     return Card(
       child: ListTile(
           leading: Icon(Icons.person, color: isUser ? Colors.green : null),
-          title: !hasName
-              ? Dot3ProgressIndicator(
-                  prefix: 'tritt bei',
-                  textStyle: theme.textTheme.titleMedium!
-                      .copyWith(fontStyle: FontStyle.italic),
-                )
-              : Text(
-                  member.name,
-                  style: theme.textTheme.titleLarge!,
-                )),
+          title: Text(
+            member.name,
+          )),
     );
   }
 

@@ -1,3 +1,4 @@
+import 'package:brot/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animator/animation/animation_preferences.dart';
 import 'package:flutter_animator/animation/animator_play_states.dart';
@@ -21,8 +22,7 @@ class IsBreadHeaderWidget extends StatelessWidget {
             child: SvgPicture.asset('assets/images/bread.svg', height: 150)),
         Text(
           'Du bist das Brot! 😱',
-          style:
-              theme.textTheme.displaySmall!.copyWith(color: theme.primaryColor),
+          style: theme.textTheme.header1,
         )
       ],
     );

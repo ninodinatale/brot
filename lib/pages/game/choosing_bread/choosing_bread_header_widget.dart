@@ -1,3 +1,4 @@
+import 'package:brot/main.dart';
 import 'package:brot/widgets/dot3_progress_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart' show SvgPicture;
@@ -11,7 +12,7 @@ class ChoosingBreadHeaderWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final styleText =
-        theme.textTheme.titleLarge!.copyWith(color: theme.primaryColor);
+        theme.textTheme.header1;
     final styleIcons = theme.textTheme.titleLarge!.copyWith(
         color: theme.primaryColor,
         fontSize: theme.textTheme.titleLarge!.fontSize! * 2);
