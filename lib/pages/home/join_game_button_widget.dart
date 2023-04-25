@@ -2,11 +2,11 @@ import 'package:brot/constants.dart';
 import 'package:brot/database.dart';
 import 'package:brot/models/state/user_id.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../logger.dart';
 import '../../router.dart';
+import '../../widgets/bottom_sheet_modal.dart';
 
 class JoinGameButtonWidget extends StatefulWidget {
   const JoinGameButtonWidget({Key? key}) : super(key: key);
@@ -45,11 +45,11 @@ class JoinGameButtonWidgetState extends State<JoinGameButtonWidget> {
       logI('navigating to {}', ['${route.location}']);
       route.go(context);
     }).catchError((error, stackTrace) {
-      if (error.code == ErrorCodes.gameNotFound) {
+      if (error['code'] == ErrorCodes.gameNotFound) {
         setState(() {
           _isGameNotFound = true;
         });
-      } else if (error.code == ErrorCodes.gameAlreadyStarted) {
+      } else if (error['code'] == ErrorCodes.gameAlreadyStarted) {
         setState(() {
           _isGameStarted = true;
         });
@@ -60,35 +60,38 @@ class JoinGameButtonWidgetState extends State<JoinGameButtonWidget> {
   }
 
   void _joinGamePressed() {
-    showDialog<String>(
+    brotModalBottomSheet<void>(
+        isDismissible: true,
         context: context,
-        builder: (BuildContext context) => StatefulBuilder(
-              builder: (context, setState) => AlertDialog(
-                title: const Text('Spiel beitreten'),
-                content: TextField(
-                  keyboardType: const TextInputType.numberWithOptions(
-                      decimal: false, signed: false),
-                  onChanged: (value) {
-                    _isGameNotFound = false;
-                    _isGameStarted = false;
-                    setState(() {
-                      _isValid = value.length == 6;
-                    });
-                  },
-                  controller: _controller,
-                  decoration: InputDecoration(
-                      label: const Text('Spiel-Code'), errorText: _errorText),
-                ),
-                actions: <Widget>[
-                  TextButton(
-                    onPressed: () => context.pop(),
-                    child: const Text('Abbrechen'),
+        child: StatefulBuilder(
+          builder: (statefulBuilderCtx, setState) {
+            return Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    keyboardType: const TextInputType.numberWithOptions(
+                        decimal: false, signed: false),
+                    onChanged: (value) {
+                      _isGameNotFound = false;
+                      _isGameStarted = false;
+                      setState(() {
+                        _isValid = value.length == 6;
+                      });
+                    },
+                    controller: _controller,
+                    decoration: InputDecoration(
+                        label: const Text('Spiel-Code'), errorText: _errorText),
                   ),
-                  Consumer<UserId>(
-                    builder: (context, userId, child) => ElevatedButton(
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: SizedBox(
+                    child: FilledButton(
                       onPressed: _isValid
                           ? () => _joinGame(
-                              setState, userId, _controller.value.text)
+                              setState,
+                              statefulBuilderCtx.read<UserId>(),
+                              _controller.value.text)
                           : null,
                       child: _isJoinGameLoading
                           ? CircularProgressIndicator(
@@ -97,9 +100,11 @@ class JoinGameButtonWidgetState extends State<JoinGameButtonWidget> {
                           : const Text('Beitreten'),
                     ),
                   ),
-                ],
-              ),
-            ));
+                )
+              ],
+            );
+          },
+        ));
   }
 
   @override

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 Future<T?> brotModalBottomSheet<T>(
-    {required BuildContext context, required Widget child}) {
+    {required BuildContext context, required Widget child, isDismissible = false}) {
   return showModalBottomSheet<T>(
       backgroundColor: Colors.transparent,
-      isDismissible: false,
+      isDismissible: isDismissible,
       context: context,
       builder: (BuildContext context) {
         return Container(
