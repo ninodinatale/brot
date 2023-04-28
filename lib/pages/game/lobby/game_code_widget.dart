@@ -7,6 +7,7 @@ import 'package:brot/models/state/member.dart';
 import 'package:brot/router.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_animator/flutter_animator.dart';
 import 'package:provider/provider.dart';
 
@@ -26,11 +27,14 @@ class _GameCodeWidgetState extends State<GameCodeWidget> {
   Widget get _startGameButtonChild {
     return _isStartGameLoading
         ? SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(
-              color: Theme.of(context).colorScheme.onPrimary,
-            ))
+        width: 20,
+        height: 20,
+        child: CircularProgressIndicator(
+          color: Theme
+              .of(context)
+              .colorScheme
+              .onPrimary,
+        ))
         : const Text('Start');
   }
 
@@ -39,46 +43,50 @@ class _GameCodeWidgetState extends State<GameCodeWidget> {
     brotModalBottomSheet<void>(
       context: context,
       child: StatefulBuilder(
-        builder: (context, setState) => Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Center(
-                child: Text(
-                  'Spiel verlassen?',
-                  style: Theme.of(context).textTheme.header1,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    TextButton(
-                        child: Text('Abbrechen'),
-                        onPressed: () => Navigator.pop(context)),
-                    const Spacer(),
-                    ElevatedButton(
-                      child: const Text('Verlassen'),
-                      onPressed: () {
-                        logI('leaving game {} for member {}',
-                            ['$game', '$member']);
-                        FirebaseDatabase.instance
-                            .ref('/members/${game.key}/${member.key}')
-                            .remove();
+        builder: (context, setState) =>
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Center(
+                    child: Text(
+                      'Spiel verlassen?',
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .header1,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        TextButton(
+                            child: Text('Abbrechen'),
+                            onPressed: () => Navigator.pop(context)),
+                        const Spacer(),
+                        ElevatedButton(
+                          child: const Text('Verlassen'),
+                          onPressed: () {
+                            logI('leaving game {} for member {}',
+                                ['$game', '$member']);
+                            FirebaseDatabase.instance
+                                .ref('/members/${game.key}/${member.key}')
+                                .remove();
 
-                        const route = HomeRoute();
-                        logI('navigating to {}', ['${route.location}']);
-                        route.go(context);
-                      },
-                    )
-                  ],
-                ),
+                            const route = HomeRoute();
+                            logI('navigating to {}', ['${route.location}']);
+                            route.go(context);
+                          },
+                        )
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
       ),
     );
   }
@@ -87,39 +95,43 @@ class _GameCodeWidgetState extends State<GameCodeWidget> {
     brotModalBottomSheet<void>(
       context: context,
       child: StatefulBuilder(
-        builder: (context, setState) => Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Center(
-                child: Text(
-                  'Spiel starten?',
-                  style: Theme.of(context).textTheme.header1,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    TextButton(
-                        child: Text('Abbrechen'),
-                        onPressed: () => Navigator.pop(context)),
-                    const Spacer(),
-                    ElevatedButton(
-                      child: const Text('Starten'),
-                      onPressed: () {
-                        _startGame(game);
-                        Navigator.pop(context);
-                      },
+        builder: (context, setState) =>
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Center(
+                    child: Text(
+                      'Spiel starten?',
+                      style: Theme
+                          .of(context)
+                          .textTheme
+                          .header1,
                     ),
-                  ],
-                ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        TextButton(
+                            child: Text('Abbrechen'),
+                            onPressed: () => Navigator.pop(context)),
+                        const Spacer(),
+                        ElevatedButton(
+                          child: const Text('Starten'),
+                          onPressed: () {
+                            _startGame(game);
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
       ),
     );
   }
@@ -158,13 +170,22 @@ class _GameCodeWidgetState extends State<GameCodeWidget> {
 
     return Column(
       children: [
-        Center(
-          child: Pulse(
-              preferences: const AnimationPreferences(
-                  offset: Duration(seconds: 2),
-                  magnitude: 10,
-                  autoPlay: AnimationPlayStates.Loop),
-              child: Text(game.gameCode, style: theme.textTheme.header1)),
+        GestureDetector(
+          onTap: () {
+            Clipboard.setData(ClipboardData(text: game.gameCode))
+                .then((_) =>
+                ScaffoldMessenger.of(context).showSnackBar(
+                  BrotSnackBar(context: context, content: const Text('Code kopiert')),
+                ));
+          },
+          child: Center(
+            child: Pulse(
+                preferences: const AnimationPreferences(
+                    offset: Duration(seconds: 2),
+                    magnitude: 10,
+                    autoPlay: AnimationPlayStates.Loop),
+                child: Text(game.gameCode, style: theme.textTheme.header1)),
+          ),
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
@@ -184,4 +205,17 @@ class _GameCodeWidgetState extends State<GameCodeWidget> {
       ],
     );
   }
+}
+
+SnackBar BrotSnackBar({required BuildContext context,
+  required Widget content,
+  SnackBarAction? action}) {
+  return SnackBar(
+    action: action,
+    content: content,
+    padding: const EdgeInsets.symmetric(
+      horizontal: 20,
+      vertical: 14
+    ),
+  );
 }

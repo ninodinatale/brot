@@ -1,11 +1,11 @@
 import 'package:brot/models/state/game.dart';
 import 'package:brot/pages/game/choosing_bread/choosing_bread_header_widget.dart';
+import 'package:brot/pages/game/voting_words/header/voting_words_header_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../widgets/slide_up_down_switcher.dart';
 import 'lobby/lobby_header_widget.dart';
-import 'playing/playing_header_widget.dart';
 
 class HeaderWidget extends StatefulWidget {
   const HeaderWidget({super.key});

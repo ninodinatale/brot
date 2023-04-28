@@ -4,11 +4,11 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../logger.dart';
-import '../../../models/state/game.dart';
-import '../../../models/state/user_id.dart';
-import '../../../models/state/word.dart';
-import '../../../widgets/bottom_sheet_modal.dart';
+import '../../../../logger.dart';
+import '../../../../models/state/game.dart';
+import '../../../../models/state/user_id.dart';
+import '../../../../models/state/word.dart';
+import '../../../../widgets/bottom_sheet_modal.dart';
 
 class NotBreadHeaderWidget extends StatefulWidget {
   const NotBreadHeaderWidget({

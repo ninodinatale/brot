@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:brot/pages/game/voting_words/voting_words_wrapper_widget.dart';
+import 'package:brot/pages/game/voting_words/content/voting_words_wrapper_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

@@ -28,9 +28,9 @@ void main() async {
     try {
       // Workaround for https://github.com/firebase/flutterfire/issues/8070
       final emulatorHost =
-      (!kIsWeb && defaultTargetPlatform == TargetPlatform.android)
-          ? '10.0.2.2'
-          : 'localhost';
+          (!kIsWeb && defaultTargetPlatform == TargetPlatform.android)
+              ? '10.0.2.2'
+              : 'localhost';
 
       FirebaseDatabase.instance.useDatabaseEmulator(emulatorHost, 5901);
     } catch (e) {
@@ -57,17 +57,22 @@ extension HeaderStyles on TextTheme {
   TextStyle get header1 {
     return TextStyle(
         color: _colorScheme.onPrimaryContainer,
-        fontWeight: FontWeight.w500, fontSize: 24);
+        fontWeight: FontWeight.w500,
+        fontSize: 24);
   }
+
   TextStyle get header2 {
     return TextStyle(
         color: _colorScheme.onPrimaryContainer,
-        fontWeight: FontWeight.w500, fontSize: 18);
+        fontWeight: FontWeight.w500,
+        fontSize: 18);
   }
+
   TextStyle get headerTimer {
     return TextStyle(
         color: _colorScheme.secondary,
-        fontWeight: FontWeight.w500, fontSize: 14);
+        fontWeight: FontWeight.w500,
+        fontSize: 14);
   }
 }
 
@@ -100,9 +105,17 @@ class _MyAppState extends State<MyApp> {
     var buttonStyle = ButtonStyle(
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
             RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18.0),
-            )));
+      borderRadius: BorderRadius.circular(18.0),
+    )));
 
+    final _textTheme = const TextTheme(
+      titleLarge: TextStyle(fontWeight: FontWeight.w500),
+      titleMedium: TextStyle(fontWeight: FontWeight.w500),
+      titleSmall: TextStyle(fontWeight: FontWeight.w500),
+      bodyLarge: TextStyle(fontWeight: FontWeight.w500),
+      bodyMedium: TextStyle(fontWeight: FontWeight.w500),
+      bodySmall: TextStyle(fontWeight: FontWeight.w500),
+    );
 
     return MaterialApp.router(
       title: 'who-is-the-bread',
@@ -117,79 +130,79 @@ class _MyAppState extends State<MyApp> {
           selectedColor: _colorScheme.onSecondary.withOpacity(0.8),
         ),
 
+        snackBarTheme: SnackBarThemeData(
+            backgroundColor: _colorScheme.secondary,
+            contentTextStyle: _textTheme.bodyMedium!.copyWith(
+              color: _colorScheme.onSecondary.withOpacity(0.8),
+            ),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30.0),
+            ),
+            actionTextColor: _colorScheme.primary),
+
         // Define the default `TextTheme`. Use this to specify the default
         // text styling for headlines, titles, bodies of text, and more.
-        textTheme: const TextTheme(
-          titleLarge: TextStyle(fontWeight: FontWeight.w500),
-          titleMedium: TextStyle(fontWeight: FontWeight.w500),
-          titleSmall: TextStyle(fontWeight: FontWeight.w500),
-          bodyLarge: TextStyle(fontWeight: FontWeight.w500),
-          bodyMedium: TextStyle(fontWeight: FontWeight.w500),
-          bodySmall: TextStyle(fontWeight: FontWeight.w500),
-        ),
+        textTheme: _textTheme,
 
         elevatedButtonTheme: ElevatedButtonThemeData(style: buttonStyle),
         outlinedButtonTheme: OutlinedButtonThemeData(style: buttonStyle),
 
         inputDecorationTheme: InputDecorationTheme(
             border:
-            OutlineInputBorder(borderRadius: BorderRadius.circular(30))),
+                OutlineInputBorder(borderRadius: BorderRadius.circular(30))),
 
         // Needed - without buttons in web do not have margins.
         materialTapTargetSize: MaterialTapTargetSize.padded,
       ),
       routerConfig: router,
-      builder: (context, child) =>
-          FutureBuilder(
-            future: _userId,
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.none:
-                case ConnectionState.waiting:
-                  return const CircularProgressIndicator();
-                case ConnectionState.active:
-                case ConnectionState.done:
-                  if (snapshot.hasError || snapshot.data == null) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    return Provider<UserId>(
-                      create: (context) => snapshot.requireData,
-                      child: Scaffold(
-                        key: scaffoldKey,
-                        body: Container(
-                          decoration: BoxDecoration(
-                            color: _colorScheme.tertiary,
-                            image: DecorationImage(
-                              fit: BoxFit.cover,
-                              image: Image
-                                  .asset(
-                                'assets/images/background_overlay.png',
-                              )
-                                  .image,
-                            ),
-                          ),
-                          child: LayoutBuilder(
-                            builder:
-                                (BuildContext context,
-                                BoxConstraints constraints) {
-                              if (constraints.maxWidth > 600) {
-                                return Center(
-                                    child: SizedBox(
-                                      width: 600,
-                                      child: child,
-                                    ));
-                              } else {
-                                return Center(child: child);
-                              }
-                            },
-                          ),
+      builder: (context, child) => FutureBuilder(
+        future: _userId,
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+            case ConnectionState.waiting:
+              return const CircularProgressIndicator();
+            case ConnectionState.active:
+            case ConnectionState.done:
+              if (snapshot.hasError || snapshot.data == null) {
+                return Text('Error: ${snapshot.error}');
+              } else {
+                return Provider<UserId>(
+                  create: (context) => snapshot.requireData,
+                  child: Scaffold(
+                    key: scaffoldKey,
+                    body: Container(
+                      decoration: BoxDecoration(
+                        color: _colorScheme.tertiary,
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: Image.asset(
+                            'assets/images/background_overlay.png',
+                          ).image,
                         ),
                       ),
-                    );
-                  }
+                      child: LayoutBuilder(
+                        builder:
+                            (BuildContext context, BoxConstraints constraints) {
+                          if (constraints.maxWidth > 600) {
+                            return Center(
+                                child: SizedBox(
+                              width: 600,
+                              child: child,
+                            ));
+                          } else {
+                            return Center(child: child);
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                );
               }
-            },
-          ),
+          }
+        },
+      ),
     );
   }
 }

@@ -6,12 +6,12 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../logger.dart';
-import '../../../models/state/user_id.dart';
-import '../../../widgets/animated_flash.dart';
-import '../../../widgets/animated_int_widget.dart';
-import '../../../widgets/bottom_sheet_modal.dart';
-import '../../../widgets/brot_animated_list.dart';
+import '../../../../logger.dart';
+import '../../../../models/state/user_id.dart';
+import '../../../../widgets/animated_flash.dart';
+import '../../../../widgets/animated_int_widget.dart';
+import '../../../../widgets/bottom_sheet_modal.dart';
+import '../../../../widgets/brot_animated_list.dart';
 
 class IsNotBreadVotingWordsContentWidget extends StatefulWidget {
   IsNotBreadVotingWordsContentWidget({Key? key, required this.gameKey})
