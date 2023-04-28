@@ -27,7 +27,7 @@
       "port": 8080
     },
     "database": {
-      "port": 9000
+      "port": 5901
     },
     "ui": {
       "enabled": true

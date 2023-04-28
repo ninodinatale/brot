@@ -8,10 +8,10 @@ import 'package:brot/router.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animator/flutter_animator.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../logger.dart';
+import '../../../widgets/bottom_sheet_modal.dart';
 
 class GameCodeWidget extends StatefulWidget {
   const GameCodeWidget({Key? key}) : super(key: key);
@@ -36,14 +36,92 @@ class _GameCodeWidgetState extends State<GameCodeWidget> {
 
   /// Leaves the game as member.
   void _leaveGame(Game game, Member member) {
-    logI('leaving game {} for member {}', ['$game', '$member']);
-    FirebaseDatabase.instance
-        .ref('/members/${game.key}/${member.key}')
-        .remove();
+    brotModalBottomSheet<void>(
+      context: context,
+      child: StatefulBuilder(
+        builder: (context, setState) => Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(
+                child: Text(
+                  'Spiel verlassen?',
+                  style: Theme.of(context).textTheme.header1,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    TextButton(
+                        child: Text('Abbrechen'),
+                        onPressed: () => Navigator.pop(context)),
+                    const Spacer(),
+                    ElevatedButton(
+                      child: const Text('Verlassen'),
+                      onPressed: () {
+                        logI('leaving game {} for member {}',
+                            ['$game', '$member']);
+                        FirebaseDatabase.instance
+                            .ref('/members/${game.key}/${member.key}')
+                            .remove();
 
-    const route = HomeRoute();
-    logI('navigating to {}', ['${route.location}']);
-    route.go(context);
+                        const route = HomeRoute();
+                        logI('navigating to {}', ['${route.location}']);
+                        route.go(context);
+                      },
+                    )
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _startGamePressed(Game game) {
+    brotModalBottomSheet<void>(
+      context: context,
+      child: StatefulBuilder(
+        builder: (context, setState) => Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(
+                child: Text(
+                  'Spiel starten?',
+                  style: Theme.of(context).textTheme.header1,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    TextButton(
+                        child: Text('Abbrechen'),
+                        onPressed: () => Navigator.pop(context)),
+                    const Spacer(),
+                    ElevatedButton(
+                      child: const Text('Starten'),
+                      onPressed: () {
+                        _startGame(game);
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   /// Starts the game.
@@ -94,30 +172,11 @@ class _GameCodeWidgetState extends State<GameCodeWidget> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               OutlinedButton(
-                  onPressed: () => {
-                        showDialog<String>(
-                            context: context,
-                            builder: (BuildContext context) => AlertDialog(
-                                  title: const Text('Spiel verlassen?'),
-                                  actions: <Widget>[
-                                    TextButton(
-                                      onPressed: () => context.pop(),
-                                      child: const Text('Abbrechen'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () =>
-                                          _leaveGame(game, userMember),
-                                      child: Text('Verlassen',
-                                          style: TextStyle(
-                                              color: theme.colorScheme.secondary)),
-                                    ),
-                                  ],
-                                )),
-                      },
+                  onPressed: () => _leaveGame(game, userMember),
                   child: const Text('Verlassen')),
               if (userMember.isAdmin)
                 ElevatedButton(
-                    onPressed: () => _startGame(game),
+                    onPressed: () => _startGamePressed(game),
                     child: _startGameButtonChild)
             ],
           ),

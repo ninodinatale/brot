@@ -5,6 +5,12 @@
       "gameCode": "455359",
       "key": "-NTXgdRhamsX97X8l2HL",
       "status": 0
+    },
+    "-NTtA5b_hQgAOwa7E4yd": {
+      "adminUserId": "9f413f50-d629-11ed-a5b5-cfc732e5ff14",
+      "gameCode": "897499",
+      "key": "-NTtA5b_hQgAOwa7E4yd",
+      "status": 0
     }
   },
   "members": {
@@ -30,6 +36,32 @@
         "isAdmin": false,
         "isBread": false,
         "key": "-NTXgphZ_tbzJjdsKqEa",
+        "name": "Chabi",
+        "userId": "e3f0f2e0-e014-11ed-ba14-c15a1c503f16"
+      }
+    },
+    "-NTtA5b_hQgAOwa7E4yd": {
+      "-NTtA5bw5NIXptIJsQHJ": {
+        "hasVotedForWord": false,
+        "isAdmin": true,
+        "isBread": false,
+        "key": "-NTtA5bw5NIXptIJsQHJ",
+        "name": "Nino",
+        "userId": "9f413f50-d629-11ed-a5b5-cfc732e5ff14"
+      },
+      "-NTtABCI8u7FiWDGAiCp": {
+        "hasVotedForWord": false,
+        "isAdmin": false,
+        "isBread": false,
+        "key": "-NTtABCI8u7FiWDGAiCp",
+        "name": "Jonin",
+        "userId": "390f55e0-d6e3-11ed-be3e-998d9610ffd9"
+      },
+      "-NTtAI5ivgDjDj-6upQ3": {
+        "hasVotedForWord": false,
+        "isAdmin": false,
+        "isBread": false,
+        "key": "-NTtAI5ivgDjDj-6upQ3",
         "name": "Chabi",
         "userId": "e3f0f2e0-e014-11ed-ba14-c15a1c503f16"
       }

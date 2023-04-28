@@ -32,7 +32,7 @@ void main() async {
           ? '10.0.2.2'
           : 'localhost';
 
-      FirebaseDatabase.instance.useDatabaseEmulator(emulatorHost, 9000);
+      FirebaseDatabase.instance.useDatabaseEmulator(emulatorHost, 5901);
     } catch (e) {
       logE('setting up database emulator failed - error: $e');
       return;
@@ -123,6 +123,9 @@ class _MyAppState extends State<MyApp> {
           titleLarge: TextStyle(fontWeight: FontWeight.w500),
           titleMedium: TextStyle(fontWeight: FontWeight.w500),
           titleSmall: TextStyle(fontWeight: FontWeight.w500),
+          bodyLarge: TextStyle(fontWeight: FontWeight.w500),
+          bodyMedium: TextStyle(fontWeight: FontWeight.w500),
+          bodySmall: TextStyle(fontWeight: FontWeight.w500),
         ),
 
         elevatedButtonTheme: ElevatedButtonThemeData(style: buttonStyle),

@@ -70,22 +70,20 @@ class _IsNotBreadVotingWordsContentWidgetState
     brotModalBottomSheet<void>(
       context: context,
       child: StatefulBuilder(
-        builder: (context, setState) => Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
+        builder: (context, setState) => Row(
           children: <Widget>[
-            const Text('Modal BottomSheet'),
-            ElevatedButton(
-              child: Text('Für "${item.value}" voten'),
-              onPressed: () {
-                voteForWord(item, context.read<UserId>());
-                Navigator.pop(context);
-              },
-            ),
             TextButton(
               child: Text('Abbrechen'),
               onPressed: () {
                 _list.currentState?.deselect();
+                Navigator.pop(context);
+              },
+            ),
+            const Spacer(),
+            ElevatedButton(
+              child: Text('Für "${item.value}" voten'),
+              onPressed: () {
+                voteForWord(item, context.read<UserId>());
                 Navigator.pop(context);
               },
             ),
@@ -111,7 +109,9 @@ class _IsNotBreadVotingWordsContentWidgetState
           title: Text(
             word.value,
           ),
-          trailing: AnimatedInt(value: word.votes),
+          trailing: AnimatedInt(
+              value: word.votes,
+              textStyle: Theme.of(context).textTheme.titleMedium),
         ),
       ),
     );
