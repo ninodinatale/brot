@@ -50,20 +50,27 @@ class _AnimatedHeaderState extends State<AnimatedHeader> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      elevation: 20.0,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(40.0),
-          bottomRight: Radius.circular(40.0),
-          topLeft: Radius.circular(0.0),
-          topRight: Radius.circular(0.0),
-        ),
-      ),
-      child: SlideUpDownSwitcher(
-        triggerValue: widget.gameStatus,
-        child: _getHeaderWidget(widget.gameStatus),
+    return SizedBox(
+      height: 200,
+      child: Column(
+        children: [
+          Material(
+            color: Colors.transparent,
+            elevation: 20.0,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(40.0),
+                bottomRight: Radius.circular(40.0),
+                topLeft: Radius.circular(0.0),
+                topRight: Radius.circular(0.0),
+              ),
+            ),
+            child: SlideUpDownSwitcher(
+              triggerValue: widget.gameStatus,
+              child: _getHeaderWidget(widget.gameStatus),
+            ),
+          ),
+        ],
       ),
     );
   }
