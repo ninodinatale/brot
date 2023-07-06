@@ -7,10 +7,12 @@ enum GameStatus {
   @JsonValue(0)
   lobby,
   @JsonValue(1)
-  choosingBread,
+  scoreBoard,
   @JsonValue(2)
-  votingWords,
+  choosingBread,
   @JsonValue(3)
+  votingWords,
+  @JsonValue(4)
   playing;
 }
 

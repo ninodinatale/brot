@@ -2,6 +2,9 @@
   "rules": {
     ".read": true,
     ".write": true,
+    "games": {
+      ".indexOn": "gameCode"
+    },
     "members": {
       "$gameKey": {
         ".indexOn": "userId"

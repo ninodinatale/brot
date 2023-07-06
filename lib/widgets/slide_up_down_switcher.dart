@@ -14,8 +14,8 @@ class SlideUpDownSwitcher<T> extends StatelessWidget {
         duration: const Duration(milliseconds: 1000),
         transitionBuilder: (Widget child, Animation<double> animation) {
           final sizeAnimation = TweenSequence<double>([
-            TweenSequenceItem(tween: ConstantTween(0.0), weight: 1),
-            TweenSequenceItem(tween: Tween(begin: 0, end: 1), weight: 1),
+            TweenSequenceItem(tween: ConstantTween(0.0), weight: 4),
+            TweenSequenceItem(tween: Tween(begin: 0, end: 1), weight: 2),
           ]).animate(animation);
           return SizeTransition(
             axisAlignment: 1,

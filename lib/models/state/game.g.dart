@@ -22,7 +22,8 @@ Map<String, dynamic> _$GameToJson(Game instance) => <String, dynamic>{
 
 const _$GameStatusEnumMap = {
   GameStatus.lobby: 0,
-  GameStatus.choosingBread: 1,
-  GameStatus.votingWords: 2,
-  GameStatus.playing: 3,
+  GameStatus.scoreBoard: 1,
+  GameStatus.choosingBread: 2,
+  GameStatus.votingWords: 3,
+  GameStatus.playing: 4,
 };

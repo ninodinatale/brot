@@ -60,6 +60,7 @@ class _WordsWidgetState extends State<WordsWidget> {
 
   Widget _itemBuilder(BuildContext context, Word word, bool isSelected) {
     return Card(
+
         child: ListTile(
             selected: isSelected,
             title: Text(

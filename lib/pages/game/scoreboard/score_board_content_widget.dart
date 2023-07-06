@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:brot/models/state/member.dart';
+import 'package:brot/widgets/animated_count.dart';
 import 'package:brot/widgets/brot_animated_list.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,7 @@ import 'package:provider/provider.dart';
 
 import '../../../logger.dart';
 import '../../../models/state/user_id.dart';
+import '../../../widgets/brot_list_item.dart';
 
 class ScoreBoardContentWidget extends StatefulWidget {
   const ScoreBoardContentWidget(this.gameKey, {Key? key}) : super(key: key);
@@ -28,7 +30,7 @@ class _ScoreBoardContentWidgetState extends State<ScoreBoardContentWidget> {
     _subs = [
       FirebaseDatabase.instance
           .ref('/members/${widget.gameKey}')
-          .onChildAdded
+          .onValue
           .map((event) {
             logI('onChildAdded fired for path {} with value {}',
                 ['/members/${widget.gameKey}', '${event.snapshot.value}']);
@@ -38,39 +40,6 @@ class _ScoreBoardContentWidgetState extends State<ScoreBoardContentWidget> {
           .listen((member) {
             _list.currentState?.insert(member);
           }),
-      FirebaseDatabase.instance
-          .ref('/members/${widget.gameKey}')
-          .onChildRemoved
-          .listen((event) {
-        logI('onChildRemoved fired for path {} with value {}',
-            ['/members/${widget.gameKey}', '${event.snapshot.value}']);
-      }),
-      FirebaseDatabase.instance
-          .ref('/members/${widget.gameKey}')
-          .onChildChanged
-          .map((event) {
-            logI('onChildChanged fired for path {} with value {}',
-                ['/members/${widget.gameKey}', '${event.snapshot.value}']);
-            return Member.fromJson(event.snapshot.value as Map);
-          })
-          .where((member) => member.name.isNotEmpty)
-          .listen((changedMember) {
-            final index = _list.currentState?.items.indexWhere(
-                (existingMember) => existingMember.key == changedMember.key);
-            if (index != null && index >= 0) {
-              logI('member {} already in list, replacing them...',
-                  ['$changedMember']);
-              setState(() {
-                _list.currentState?.items
-                    .replaceRange(index, index + 1, [changedMember]);
-              });
-            } else {
-              logI(
-                  'member {} does not exist in current member list, inserting them...',
-                  ['$changedMember']);
-              _list.currentState?.insert(changedMember);
-            }
-          })
     ];
   }
 
@@ -81,15 +50,18 @@ class _ScoreBoardContentWidgetState extends State<ScoreBoardContentWidget> {
   }
 
   Widget _itemBuilder(BuildContext context, Member member, bool isSelected) {
+    final theme = Theme.of(context);
     final userId = Provider.of<UserId>(context);
-
-    final isUser = member.userId == userId;
-    return Card(
-      child: ListTile(
-          leading: Icon(Icons.person, color: isUser ? Colors.green : null),
-          title: Text(
-            member.name,
-          )),
+    final iconColor = member.userId == userId
+        ? theme.colorScheme.primary
+        : theme.colorScheme.secondary;
+    return BrotListItem(
+      leading: Icon(Icons.account_circle, color: iconColor, size: 28),
+      title: Text(
+        member.name,
+      ),
+      subtitle: const Text('War noch nicht Brot'),
+      trailing: AnimatedCount(count: member.points),
     );
   }
 

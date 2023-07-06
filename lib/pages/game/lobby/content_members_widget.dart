@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 
 import '../../../logger.dart';
 import '../../../models/state/user_id.dart';
+import '../../../widgets/brot_list_item.dart';
 
 class ContentMembersWidget extends StatefulWidget {
   const ContentMembersWidget(this.gameKey, {Key? key}) : super(key: key);
@@ -81,15 +82,17 @@ class _ContentMembersWidgetState extends State<ContentMembersWidget> {
   }
 
   Widget _itemBuilder(BuildContext context, Member member, bool isSelected) {
+    final theme = Theme.of(context);
     final userId = Provider.of<UserId>(context);
-
-    final isUser = member.userId == userId;
-    return Card(
-      child: ListTile(
-          leading: Icon(Icons.person, color: isUser ? Colors.green : null),
-          title: Text(
-            member.name,
-          )),
+    final iconColor = member.userId == userId
+        ? theme.colorScheme.primary
+        : theme.colorScheme.secondary;
+    return BrotListItem(
+      leading: SizedBox.expand(
+          child: Icon(Icons.account_circle, color: iconColor, size: 28)),
+      title: Text(
+        member.name,
+      ),
     );
   }
 
@@ -101,3 +104,4 @@ class _ContentMembersWidgetState extends State<ContentMembersWidget> {
     );
   }
 }
+

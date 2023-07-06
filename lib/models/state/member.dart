@@ -13,14 +13,16 @@ class Member extends ChangeNotifier {
   final bool isAdmin;
   final bool isBread;
   final bool hasVotedForWord;
+  final int points;
 
   Member(
       {required this.key,
       required this.userId,
-      this.isAdmin = false,
-      this.hasVotedForWord = false,
+      required this.isAdmin,
+      required this.points,
+      required this.hasVotedForWord,
       required this.name,
-      this.isBread = false});
+      required this.isBread});
 
   factory Member.firstFromJson(Map<dynamic, dynamic> json) =>
       Member.fromJson(json.values.first);
@@ -34,6 +36,7 @@ class Member extends ChangeNotifier {
     return toJson().toString();
   }
 }
+
 @JsonSerializable(anyMap: true, explicitToJson: true)
 @immutable
 class UserIsBread {
@@ -41,5 +44,6 @@ class UserIsBread {
 
   const UserIsBread(this.value);
 
-  factory UserIsBread.fromJson(Map<dynamic, dynamic> json) => _$UserIsBreadFromJson(json);
+  factory UserIsBread.fromJson(Map<dynamic, dynamic> json) =>
+      _$UserIsBreadFromJson(json);
 }

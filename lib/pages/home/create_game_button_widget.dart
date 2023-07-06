@@ -1,9 +1,10 @@
-import 'package:brot/database.dart';
+import 'package:brot/firebase_functions.dart';
 import 'package:brot/models/state/user_id.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../logger.dart';
+import '../../models/payload/payloads.dart';
 import '../../router.dart';
 
 class CreateGameButtonWidget extends StatefulWidget {
@@ -23,13 +24,14 @@ class CreateGameButtonWidgetState extends State<CreateGameButtonWidget> {
       _isCreateGameLoading = true;
     });
 
-    createGame(userId).then((data) {
-      final route = GameRoute(data.item1, data.item2);
+    BrotFirebaseFunctions.callCreateGame(CreateGamePayload(userId: userId))
+        .then((result) {
+      final route = GameRoute(result.gameKey, result.memberKey);
       logI('navigating to ', ['${route.location}']);
       route.go(context);
     }).whenComplete(() => setState(() {
-          _isCreateGameLoading = false;
-        }));
+              _isCreateGameLoading = false;
+            }));
   }
 
   @override
@@ -41,16 +43,20 @@ class CreateGameButtonWidgetState extends State<CreateGameButtonWidget> {
           onPressed:
               _isCreateGameLoading ? null : () => _createGamePressed(userId),
           style: ElevatedButton.styleFrom(
-              fixedSize: const Size.fromWidth(500),
-              tapTargetSize: MaterialTapTargetSize.padded,
               backgroundColor: theme.colorScheme.primary,
+              foregroundColor: theme.colorScheme.onPrimary,
+              fixedSize: const Size.fromWidth(500),
               padding: const EdgeInsets.all(20)),
           child: _isCreateGameLoading
-              ? CircularProgressIndicator(
-                  color: theme.colorScheme.onPrimary,
+              ? SizedBox(
+                  height: 20,
+                  width: 20,
+                  child: CircularProgressIndicator(
+                    color: theme.colorScheme.onPrimary,
+                  ),
                 )
-              : Text(
-                  'spiel erstellen',
+              : const Text(
+                  'Spiel erstellen',
                 )),
     );
   }

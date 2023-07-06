@@ -1,5 +1,5 @@
 PODS:
-  - cloud_functions (4.1.0):
+  - cloud_functions (4.2.0):
     - Firebase/Functions (= 10.7.0)
     - firebase_core
     - Flutter
@@ -11,7 +11,7 @@ PODS:
   - Firebase/Functions (10.7.0):
     - Firebase/CoreOnly
     - FirebaseFunctions (~> 10.7.0)
-  - firebase_core (2.9.0):
+  - firebase_core (2.11.0):
     - Firebase/CoreOnly (= 10.7.0)
     - Flutter
   - firebase_database (10.1.0):
@@ -102,9 +102,9 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/shared_preferences_foundation/ios"
 
 SPEC CHECKSUMS:
-  cloud_functions: 1013ced10d7b82cc7b4239f86236782fe3b9fc5b
+  cloud_functions: ea4b2c12cd82967947885ce40ed01f4adc00f8e2
   Firebase: 0219acf760880eeec8ce479895bd7767466d9f81
-  firebase_core: d85432877e814811e040e7659f9c82faeab66e04
+  firebase_core: dee76ded6c693fdb38b8ea39aef7129e32e587a3
   firebase_database: 7dfac1ef83539a3716784b11f4d72d077c3464c2
   FirebaseAppCheckInterop: 8e907eea79958960a8bd2058e067f31e03a7914b
   FirebaseAuthInterop: 46201190fe90ef1f581513eb0f9fa3d7820e7d6d

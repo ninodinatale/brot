@@ -1,5 +1,6 @@
 import 'package:brot/models/state/game.dart';
 import 'package:brot/pages/game/choosing_bread/choosing_bread_header_widget.dart';
+import 'package:brot/pages/game/scoreboard/score_board_header_widget.dart';
 import 'package:brot/pages/game/voting_words/header/voting_words_header_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -38,6 +39,8 @@ class _AnimatedHeaderState extends State<AnimatedHeader> {
     switch (status) {
       case GameStatus.lobby:
         return const LobbyHeaderWidget();
+      case GameStatus.scoreBoard:
+        return const ScoreboardHeaderWidget();
       case GameStatus.choosingBread:
         return const ChoosingBreadHeaderWidget();
       case GameStatus.votingWords:

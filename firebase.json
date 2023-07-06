@@ -1,8 +1,4 @@
 {
-  "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  },
   "functions": [
     {
       "source": "functions",
@@ -19,12 +15,12 @@
       ]
     }
   ],
+  "database": {
+    "rules": "./database.rules.json"
+  },
   "emulators": {
     "functions": {
       "port": 5001
-    },
-    "firestore": {
-      "port": 8080
     },
     "database": {
       "port": 5901
@@ -33,8 +29,5 @@
       "enabled": true
     },
     "singleProjectMode": true
-  },
-  "database": {
-    "rules": "database.rules.json"
   }
 }

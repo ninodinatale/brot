@@ -8,5 +8,6 @@ typings/
 # Node.js dependency directory
 node_modules/
 
+
 # Private Key, do not check in!
-test/who-is-the-bread-867c631b8c29.json
+src/__test__/who-is-the-bread-867c631b8c29.json

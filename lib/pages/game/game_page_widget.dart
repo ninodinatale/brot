@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:brot/database.dart';
+import 'package:brot/firebase_functions.dart';
+import 'package:brot/models/payload/payloads.dart';
 import 'package:brot/models/state/game.dart';
 import 'package:brot/models/state/member.dart';
 import 'package:brot/models/state/word.dart';
@@ -27,10 +28,25 @@ class GamePageWidget extends StatefulWidget {
 
 class _GamePageWidgetState extends State<GamePageWidget> {
   Future<Tuple2<Game, Member>> _dependentFutures(UserId userId) async {
-    final game = await getGame(widget.gameKey);
-    final member = await getMember(widget.gameKey, widget.memberKey!);
+    final game = await BrotFirebaseFunctions.callGetGame(
+        GetGamePayload(gameKey: widget.gameKey));
+    final member = await BrotFirebaseFunctions.callGetMember(GetMemberPayload(
+        gameKey: widget.gameKey, memberKey: widget.memberKey!));
 
-    return Tuple2(game, member);
+    return Tuple2(
+        Game(
+            key: game.key,
+            adminUserId: game.adminUserId,
+            gameCode: game.gameCode,
+            status: game.status),
+        Member(
+            key: member.key,
+            hasVotedForWord: member.hasVotedForWord,
+            isAdmin: member.isAdmin,
+            isBread: member.isBread,
+            name: member.name,
+            points: member.points,
+            userId: member.userId));
   }
 
   Stream<GameStatus> _createGameStatusStream() {

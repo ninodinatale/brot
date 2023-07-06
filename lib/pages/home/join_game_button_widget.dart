@@ -1,12 +1,6 @@
-import 'package:brot/constants.dart';
-import 'package:brot/database.dart';
 import 'package:brot/models/state/user_id.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../logger.dart';
-import '../../router.dart';
-import '../../widgets/bottom_sheet_modal.dart';
 
 class JoinGameButtonWidget extends StatefulWidget {
   const JoinGameButtonWidget({Key? key}) : super(key: key);
@@ -40,70 +34,65 @@ class JoinGameButtonWidgetState extends State<JoinGameButtonWidget> {
       _isGameNotFound = false;
     });
 
-    joinGame(userId, gameCode).then((data) {
-      final route = GameRoute(data.item1, data.item2);
-      logI('navigating to {}', ['${route.location}']);
-      route.go(context);
-    }).catchError((error, stackTrace) {
-      if (error['code'] == ErrorCodes.gameNotFound) {
-        setState(() {
-          _isGameNotFound = true;
-        });
-      } else if (error['code'] == ErrorCodes.gameAlreadyStarted) {
-        setState(() {
-          _isGameStarted = true;
-        });
-      } else {
-        logE('joining game failed, error: $error');
-      }
-    }).whenComplete(() => setState(() => _isJoinGameLoading = false));
+    // joinGame(userId, gameCode).then((data) {
+    //   final route = GameRoute(data.item1, data.item2);
+    //   logI('navigating to {}', ['${route.location}']);
+    //   route.go(context);
+    // }).catchError((error, stackTrace) {
+    //   if (error['code'] == ErrorCodes.gameNotFound) {
+    //     setState(() {
+    //       _isGameNotFound = true;
+    //     });
+    //   } else if (error['code'] == ErrorCodes.gameAlreadyStarted) {
+    //     setState(() {
+    //       _isGameStarted = true;
+    //     });
+    //   } else {
+    //     logE('joining game failed, error: $error');
+    //   }
+    // }).whenComplete(() => setState(() => _isJoinGameLoading = false));
   }
 
   void _joinGamePressed() {
-    brotModalBottomSheet<void>(
-        isDismissible: true,
+    showDialog<String>(
         context: context,
-        child: StatefulBuilder(
-          builder: (statefulBuilderCtx, setState) {
-            return Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    keyboardType: const TextInputType.numberWithOptions(
-                        decimal: false, signed: false),
-                    onChanged: (value) {
-                      _isGameNotFound = false;
-                      _isGameStarted = false;
-                      setState(() {
-                        _isValid = value.length == 6;
-                      });
-                    },
-                    controller: _controller,
-                    decoration: InputDecoration(
-                        label: const Text('Spiel-Code'), errorText: _errorText),
-                  ),
+        builder: (BuildContext context) => StatefulBuilder(
+          builder: (context, setState) => AlertDialog(
+            title: const Text('Spiel beitreten'),
+            content: TextField(
+              keyboardType: const TextInputType.numberWithOptions(
+                  decimal: false, signed: false),
+              onChanged: (value) {
+                _isGameNotFound = false;
+                _isGameStarted = false;
+                setState(() {
+                  _isValid = value.length == 6;
+                });
+              },
+              controller: _controller,
+              decoration: InputDecoration(
+                  label: const Text('Spiel-Code'), errorText: _errorText),
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Abbrechen'),
+              ),
+              Consumer<UserId>(
+                builder: (context, userId, child) => FilledButton(
+                  onPressed: _isValid
+                      ? () => _joinGame(
+                      setState, userId, _controller.value.text)
+                      : null,
+                  child: _isJoinGameLoading
+                      ? CircularProgressIndicator(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  )
+                      : const Text('Beitreten'),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: SizedBox(
-                    child: FilledButton(
-                      onPressed: _isValid
-                          ? () => _joinGame(
-                              setState,
-                              statefulBuilderCtx.read<UserId>(),
-                              _controller.value.text)
-                          : null,
-                      child: _isJoinGameLoading
-                          ? CircularProgressIndicator(
-                              color: Theme.of(context).colorScheme.onPrimary,
-                            )
-                          : const Text('Beitreten'),
-                    ),
-                  ),
-                )
-              ],
-            );
-          },
+              ),
+            ],
+          ),
         ));
   }
 
@@ -127,10 +116,10 @@ class JoinGameButtonWidgetState extends State<JoinGameButtonWidget> {
         onPressed: () => _joinGamePressed(),
         style: ElevatedButton.styleFrom(
             fixedSize: Size.fromWidth(500),
-            tapTargetSize: MaterialTapTargetSize.padded,
             backgroundColor: theme.colorScheme.secondary,
+            foregroundColor: theme.colorScheme.onSecondary,
             padding: EdgeInsets.all(20)),
-        child: Text(
+        child: const Text(
           'spiel beitreten',
         ));
   }

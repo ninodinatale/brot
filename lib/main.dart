@@ -1,4 +1,5 @@
 import 'package:brot/constants.dart';
+import 'package:brot/firebase_functions.dart';
 import 'package:brot/models/state/user_id.dart';
 import 'package:brot/router.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -24,17 +25,18 @@ void main() async {
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
 
   if (kDebugMode) {
-    logI('using emulators for database');
+    logI('using emulators for database and functions');
     try {
       // Workaround for https://github.com/firebase/flutterfire/issues/8070
       final emulatorHost =
           (!kIsWeb && defaultTargetPlatform == TargetPlatform.android)
               ? '10.0.2.2'
-              : 'localhost';
+              : '127.0.0.1';
 
       FirebaseDatabase.instance.useDatabaseEmulator(emulatorHost, 5901);
+      BrotFirebaseFunctions.useEmulator('localhost', 5001);
     } catch (e) {
-      logE('setting up database emulator failed - error: $e');
+      logE('setting up database/functions emulator failed - error: $e');
       return;
     }
   }
@@ -120,40 +122,41 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp.router(
       title: 'who-is-the-bread',
       theme: ThemeData(
-        colorScheme: _colorScheme,
-        cardTheme: CardTheme(
-          color: _colorScheme.primaryContainer,
-        ),
-        listTileTheme: ListTileThemeData(
-          textColor: _colorScheme.onPrimaryContainer,
-          selectedTileColor: _colorScheme.secondary.withOpacity(0.8),
-          selectedColor: _colorScheme.onSecondary.withOpacity(0.8),
-        ),
-
-        snackBarTheme: SnackBarThemeData(
-            backgroundColor: _colorScheme.secondary,
-            contentTextStyle: _textTheme.bodyMedium!.copyWith(
-              color: _colorScheme.onSecondary.withOpacity(0.8),
-            ),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30.0),
-            ),
-            actionTextColor: _colorScheme.primary),
-
-        // Define the default `TextTheme`. Use this to specify the default
-        // text styling for headlines, titles, bodies of text, and more.
-        textTheme: _textTheme,
-
-        elevatedButtonTheme: ElevatedButtonThemeData(style: buttonStyle),
-        outlinedButtonTheme: OutlinedButtonThemeData(style: buttonStyle),
-
+        useMaterial3: true,
+        // colorScheme: _colorScheme,
+        // cardTheme: CardTheme(
+        //   color: _colorScheme.primaryContainer,
+        // ),
+        // listTileTheme: ListTileThemeData(
+        //   textColor: _colorScheme.onPrimaryContainer,
+        //   selectedTileColor: _colorScheme.secondary.withOpacity(0.8),
+        //   selectedColor: _colorScheme.onSecondary.withOpacity(0.8),
+        // ),
+        //
+        // snackBarTheme: SnackBarThemeData(
+        //     backgroundColor: _colorScheme.secondary,
+        //     contentTextStyle: _textTheme.bodyMedium!.copyWith(
+        //       color: _colorScheme.onSecondary.withOpacity(0.8),
+        //     ),
+        //     behavior: SnackBarBehavior.floating,
+        //     shape: RoundedRectangleBorder(
+        //       borderRadius: BorderRadius.circular(30.0),
+        //     ),
+        //     actionTextColor: _colorScheme.primary),
+        //
+        // // Define the default `TextTheme`. Use this to specify the default
+        // // text styling for headlines, titles, bodies of text, and more.
+        // textTheme: _textTheme,
+        //
+        // FilledButtonTheme: FilledButtonThemeData(style: buttonStyle),
+        // outlinedButtonTheme: OutlinedButtonThemeData(style: buttonStyle),
+        //
         inputDecorationTheme: InputDecorationTheme(
             border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(30))),
+                OutlineInputBorder(borderRadius: BorderRadius.circular(20))),
 
-        // Needed - without buttons in web do not have margins.
-        materialTapTargetSize: MaterialTapTargetSize.padded,
+        // // Needed - without buttons in web do not have margins.
+        // materialTapTargetSize: MaterialTapTargetSize.padded,
       ),
       routerConfig: router,
       builder: (context, child) => FutureBuilder(

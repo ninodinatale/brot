@@ -9,10 +9,11 @@ part of 'member.dart';
 Member _$MemberFromJson(Map json) => Member(
       key: json['key'] as String,
       userId: json['userId'] as String,
-      isAdmin: json['isAdmin'] as bool? ?? false,
-      hasVotedForWord: json['hasVotedForWord'] as bool? ?? false,
+      isAdmin: json['isAdmin'] as bool,
+      points: json['points'] as int,
+      hasVotedForWord: json['hasVotedForWord'] as bool,
       name: json['name'] as String,
-      isBread: json['isBread'] as bool? ?? false,
+      isBread: json['isBread'] as bool,
     );
 
 Map<String, dynamic> _$MemberToJson(Member instance) => <String, dynamic>{
@@ -22,6 +23,7 @@ Map<String, dynamic> _$MemberToJson(Member instance) => <String, dynamic>{
       'isAdmin': instance.isAdmin,
       'isBread': instance.isBread,
       'hasVotedForWord': instance.hasVotedForWord,
+      'points': instance.points,
     };
 
 UserIsBread _$UserIsBreadFromJson(Map json) => UserIsBread(

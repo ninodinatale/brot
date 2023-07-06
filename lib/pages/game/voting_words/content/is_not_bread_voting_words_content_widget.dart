@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:brot/database.dart';
+import 'package:brot/firebase_functions.dart';
+import 'package:brot/models/payload/payloads.dart';
 import 'package:brot/models/state/word.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -80,10 +81,13 @@ class _IsNotBreadVotingWordsContentWidgetState
               },
             ),
             const Spacer(),
-            ElevatedButton(
+            FilledButton(
               child: Text('Für "${item.value}" voten'),
               onPressed: () {
-                voteForWord(item, context.read<UserId>());
+                BrotFirebaseFunctions.callVoteForWord(VoteWordPayload(
+                        userId: context.read<UserId>(),
+                        gameKey: item.gameKey,
+                        wordKey: item.key));
                 Navigator.pop(context);
               },
             ),

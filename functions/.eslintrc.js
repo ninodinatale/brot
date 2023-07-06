@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
   env: {
-    es6: true,
+    es2020: true,
     node: true,
   },
   extends: [
@@ -18,6 +18,7 @@ module.exports = {
     sourceType: 'module',
   },
   ignorePatterns: [
+    'jest.config.js',
     '/lib/**/*', // Ignore built files.
   ],
   plugins: [
@@ -27,8 +28,6 @@ module.exports = {
   rules: {
     'quotes': ['error', 'single'],
     'import/no-unresolved': 0,
-    'indent': ['error', 2],
-    'no-trailing-spaces': 0,
-    'max-len': 0,
+    'max-len': 'off',
   },
 };

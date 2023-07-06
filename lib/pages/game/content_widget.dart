@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:brot/pages/game/scoreboard/score_board_content_widget.dart';
 import 'package:brot/pages/game/voting_words/content/voting_words_wrapper_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -43,6 +44,9 @@ class _ContentWidgetState extends State<ContentWidget> {
   Widget _gameContentBuilder(GameStatus status) {
     switch (status) {
       case GameStatus.lobby:
+        return ContentMembersWidget(widget.gameKey);
+      case GameStatus.scoreBoard:
+        return ScoreBoardContentWidget(widget.gameKey);
       case GameStatus.choosingBread:
         return ContentMembersWidget(widget.gameKey);
       case GameStatus.votingWords:
